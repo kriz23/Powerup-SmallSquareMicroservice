@@ -13,11 +13,12 @@ public enum ExceptionResponse {
     GENERIC_NAME_INVALID_EXCEPTION("The name you entered is invalid or empty"),
     GENERIC_DESCRIPTION_INVALID_EXCEPTION("The description you entered is invalid or empty"),
     CATEGORY_NOT_FOUND_EXCEPTION("The category you are looking for does not exist"),
+    DISH_NOT_FOUND_EXCEPTION("The dish you are looking for does not exist"),
     DISH_PRICE_INVALID_EXCEPTION("The price you entered is invalid or empty"),
     DISH_URL_IMAGE_INVALID_EXCEPTION("The dish image URL you entered is invalid or empty"),
     // INFRASTRUCTURE EXCEPTIONS
     RESTAURANT_ALREADY_EXISTS_EXCEPTION("A restaurant with that NIT already exists"),
-    DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists");
+    DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists in the restaurant");
     
     private final String message;
     
