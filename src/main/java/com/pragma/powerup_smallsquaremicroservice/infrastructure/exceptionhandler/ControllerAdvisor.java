@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.exceptionhandler;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAlreadyExistsException;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.RestaurantAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -24,46 +25,88 @@ public class ControllerAdvisor {
     }
     
     // DOMAIN EXCEPTIONS
-    @ExceptionHandler(NameInvalidException.class)
+    @ExceptionHandler(RestaurantNameInvalidException.class)
     public ResponseEntity<Map<String, String>> handleNameInvalidException(
-            NameInvalidException ignoredNameInvalidException) {
+            RestaurantNameInvalidException ignoredRestaurantNameInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.NAME_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_NAME_INVALID_EXCEPTION.getMessage()));
     }
     
-    @ExceptionHandler(NITInvalidException.class)
+    @ExceptionHandler(RestaurantNitInvalidException.class)
     public ResponseEntity<Map<String, String>> handleNitInvalidException(
-            NITInvalidException ignoredNitInvalidException) {
+            RestaurantNitInvalidException ignoredRestaurantNitInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.NIT_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_NIT_INVALID_EXCEPTION.getMessage()));
     }
     
-    @ExceptionHandler(AddressInvalidException.class)
+    @ExceptionHandler(RestaurantAddressInvalidException.class)
     public ResponseEntity<Map<String, String>> handleAddressInvalidException(
-            AddressInvalidException ignoredAddressInvalidException) {
+            RestaurantAddressInvalidException ignoredRestaurantAddressInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.ADDRESS_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_ADDRESS_INVALID_EXCEPTION.getMessage()));
     }
     
-    @ExceptionHandler(PhoneInvalidException.class)
+    @ExceptionHandler(RestaurantPhoneInvalidException.class)
     public ResponseEntity<Map<String, String>> handlePhoneInvalidException(
-            PhoneInvalidException ignoredPhoneInvalidException) {
+            RestaurantPhoneInvalidException ignoredRestaurantPhoneInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.PHONE_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_PHONE_INVALID_EXCEPTION.getMessage()));
     }
     
-    @ExceptionHandler(UrlLogoInvalidException.class)
+    @ExceptionHandler(RestaurantUrlLogoInvalidException.class)
     public ResponseEntity<Map<String, String>> handleUrlLogoInvalidException(
-            UrlLogoInvalidException ignoredUrlLogoInvalidException) {
+            RestaurantUrlLogoInvalidException ignoredRestaurantUrlLogoInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.URL_LOGO_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_URL_LOGO_INVALID_EXCEPTION.getMessage()));
     }
     
-    @ExceptionHandler(IdOwnerInvalidException.class)
+    @ExceptionHandler(RestaurantIdOwnerInvalidException.class)
     public ResponseEntity<Map<String, String>> handleIdOwnerInvalidException(
-            IdOwnerInvalidException ignoredIdOwnerInvalidException) {
+            RestaurantIdOwnerInvalidException ignoredRestaurantIdOwnerInvalidException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.ID_OWNER_INVALID_EXCEPTION.getMessage()));
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_ID_OWNER_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantNotFoundException(
+            RestaurantNotFoundException ignoredRestaurantNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_NOT_FOUND_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(GenericNameInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleGenericNameInvalidException(
+            GenericNameInvalidException ignoredGenericNameInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.GENERIC_NAME_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(GenericDescriptionInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleGenericDescriptionInvalidException(
+            GenericDescriptionInvalidException ignoredGenericDescriptionInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.GENERIC_DESCRIPTION_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleCategoryNotFoundException(
+            CategoryNotFoundException ignoredCategoryNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORY_NOT_FOUND_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(DishPriceInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleDishPriceInvalidException(
+            DishPriceInvalidException ignoredDishPriceInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_PRICE_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(DishUrlImageInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleDishUrlImageInvalidException(
+            DishUrlImageInvalidException ignoredDishUrlImageInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_URL_IMAGE_INVALID_EXCEPTION.getMessage()));
     }
     
     // --FEIGN EXCEPTIONS--
@@ -87,6 +130,13 @@ public class ControllerAdvisor {
             RestaurantAlreadyExistsException ignoredRestaurantAlreadyExistsException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_ALREADY_EXISTS_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(DishAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleDishAlreadyExistsException(
+            DishAlreadyExistsException ignoredDishAlreadyExistsException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_ALREADY_EXISTS_EXCEPTION.getMessage()));
     }
     
 }

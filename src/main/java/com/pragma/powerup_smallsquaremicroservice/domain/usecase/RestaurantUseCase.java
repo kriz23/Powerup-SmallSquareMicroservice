@@ -34,7 +34,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public boolean validateName(String name) {
         Pattern pattern = Pattern.compile("^(?=.*[^\\d\\s])[\\w\\s]+$");
         if (!pattern.matcher(name).matches() || name.isEmpty()) {
-            throw new NameInvalidException();
+            throw new RestaurantNameInvalidException();
         }
         return true;
     }
@@ -43,7 +43,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public boolean validateNIT(String nit) {
         Pattern pattern = Pattern.compile("^\\d{5,20}$");
         if (!pattern.matcher(nit).matches() || nit.isEmpty()) {
-            throw new NITInvalidException();
+            throw new RestaurantNitInvalidException();
         }
         return true;
     }
@@ -51,7 +51,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public boolean validateAddress(String address) {
         if (address.isEmpty()) {
-            throw new AddressInvalidException();
+            throw new RestaurantAddressInvalidException();
         }
         return true;
     }
@@ -60,7 +60,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public boolean validatePhone(String phone) {
         Pattern pattern = Pattern.compile("^\\+?\\d{9,13}$");
         if (!pattern.matcher(phone).matches() || phone.isEmpty()) {
-            throw new PhoneInvalidException();
+            throw new RestaurantPhoneInvalidException();
         }
         return true;
     }
@@ -68,7 +68,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public boolean validateUrlLogo(String urlLogo) {
         if (urlLogo.isEmpty()) {
-            throw new UrlLogoInvalidException();
+            throw new RestaurantUrlLogoInvalidException();
         }
         return true;
     }
@@ -76,7 +76,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public boolean validateIdOwner(Long idOwner) {
         if (idOwner == null || idOwner <= 0) {
-            throw new IdOwnerInvalidException();
+            throw new RestaurantIdOwnerInvalidException();
         }
         return true;
     }
