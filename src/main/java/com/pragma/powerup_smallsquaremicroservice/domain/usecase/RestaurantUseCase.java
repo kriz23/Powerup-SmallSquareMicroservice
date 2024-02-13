@@ -1,17 +1,22 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
+import feign.FeignException;
 
 import java.util.regex.Pattern;
 
 public class RestaurantUseCase implements IRestaurantServicePort {
+    private static final Long OWNER_ROLE_ID = 2L;
     private final IRestaurantPersistencePort restaurantPersistencePort;
+    private final IUserMSClientPort userMSClientPort;
     
-    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort) {
+    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IUserMSClientPort userMSClientPort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
+        this.userMSClientPort = userMSClientPort;
     }
     
     
@@ -19,7 +24,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public void createRestaurant(Restaurant restaurant) {
         if (validateName(restaurant.getName()) && validateNIT(restaurant.getNit()) && validateAddress(
                 restaurant.getAddress()) && validatePhone(restaurant.getPhone()) && validateUrlLogo(
-                restaurant.getUrlLogo()) && validateIdOwner(restaurant.getIdOwner())) {
+                restaurant.getUrlLogo()) && validateOwnerRole(restaurant.getIdOwner())) {
             restaurantPersistencePort.createRestaurant(restaurant);
         }
     }
@@ -72,6 +77,20 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public boolean validateIdOwner(Long idOwner) {
         if (idOwner == null || idOwner <= 0) {
             throw new IdOwnerInvalidException();
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean validateOwnerRole(Long idOwner) {
+        if (validateIdOwner(idOwner)) {
+            try {
+                if (!OWNER_ROLE_ID.equals(userMSClientPort.getOwnerById(idOwner).getRole().getId())){
+                    throw new RoleNotAllowedException();
+                }
+            } catch (FeignException.FeignClientException e){
+                throw new OwnerNotFoundException();
+            }
         }
         return true;
     }

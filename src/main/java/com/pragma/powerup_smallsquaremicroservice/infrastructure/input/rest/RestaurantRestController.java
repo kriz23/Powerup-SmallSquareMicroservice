@@ -24,7 +24,10 @@ public class RestaurantRestController {
     
     @Operation(summary = "Create a new restaurant")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Restaurant created", content = @Content)
-            , @ApiResponse(responseCode = "409", description = "Restaurant already exists", content = @Content)})
+            , @ApiResponse(responseCode = "409", description = "Restaurant already exists", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Owner not allowed for restaurant creation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "The owner you provided does not exists",
+            content = @Content)})
     @PostMapping("/")
     public ResponseEntity<Void> createRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto) {
         restaurantHandler.createRestaurant(restaurantRequestDto);

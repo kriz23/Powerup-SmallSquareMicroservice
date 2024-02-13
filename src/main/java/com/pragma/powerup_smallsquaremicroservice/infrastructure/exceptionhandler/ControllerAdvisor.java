@@ -66,6 +66,21 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.ID_OWNER_INVALID_EXCEPTION.getMessage()));
     }
     
+    // --FEIGN EXCEPTIONS--
+    @ExceptionHandler(OwnerNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(
+            OwnerNotFoundException ignoredOwnerNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.OWNER_NOT_FOUND_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(RoleNotAllowedException.class)
+    public ResponseEntity<Map<String, String>> handleRoleNotAllowedException(
+            RoleNotAllowedException ignoredRoleNotAllowedException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.ROLE_NOT_ALLOWED_EXCEPTION.getMessage()));
+    }
+    
     // INFRASTRUCTURE EXCEPTIONS
     @ExceptionHandler(RestaurantAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleRestaurantAlreadyExistsException(

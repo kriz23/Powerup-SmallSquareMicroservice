@@ -9,6 +9,9 @@ public enum ExceptionResponse {
     PHONE_INVALID_EXCEPTION("The restaurant phone you entered is invalid or empty"),
     URL_LOGO_INVALID_EXCEPTION("The restaurant logo URL you entered is invalid or empty"),
     ID_OWNER_INVALID_EXCEPTION("The restaurant owner's ID you entered is invalid or empty"),
+    // --FEIGN EXCEPTIONS--
+    OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
+    ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
     // INFRASTRUCTURE EXCEPTIONS
     RESTAURANT_ALREADY_EXISTS_EXCEPTION("A restaurant with that NIT already exists");
     
