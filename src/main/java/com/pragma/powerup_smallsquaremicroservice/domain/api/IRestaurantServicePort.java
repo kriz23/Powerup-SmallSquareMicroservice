@@ -11,5 +11,6 @@ public interface IRestaurantServicePort {
     boolean validatePhone(String phone);
     boolean validateUrlLogo(String urlLogo);
     boolean validateIdOwner(Long idOwner);
+    boolean validateOwnerRole(Long idOwner);
     
 }

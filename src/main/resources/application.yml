@@ -19,4 +19,4 @@ spring:
 appDescription: "Pragma Powerup"
 appVersion: "1.0.0"
 
-powerup_usermicroservice_url: "http://localhost:9000/api/v1/users"
+powerup_usermicroservice_url: "http://localhost:9000/api/v1"

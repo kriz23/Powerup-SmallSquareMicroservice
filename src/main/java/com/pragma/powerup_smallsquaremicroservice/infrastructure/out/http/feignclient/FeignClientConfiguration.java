@@ -1,9 +1,8 @@
-package com.pragma.powerup_smallsquaremicroservice.application.service;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.feignclient;
 
 import feign.Logger;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignClientConfiguration {
@@ -12,3 +11,4 @@ public class FeignClientConfiguration {
         return Logger.Level.FULL;
     }
 }
+
