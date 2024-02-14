@@ -20,7 +20,7 @@ public enum ExceptionResponse {
     DISH_URL_IMAGE_INVALID_EXCEPTION("The dish image URL you entered is invalid or empty"),
     // INFRASTRUCTURE EXCEPTIONS
     RESTAURANT_ALREADY_EXISTS_EXCEPTION("A restaurant with that NIT already exists"),
-    DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists");
+    DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists in the restaurant");
     
     private final String message;
     
