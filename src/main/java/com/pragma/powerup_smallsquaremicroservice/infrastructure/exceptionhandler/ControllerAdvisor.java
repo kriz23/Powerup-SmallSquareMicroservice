@@ -95,6 +95,13 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.CATEGORY_NOT_FOUND_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(DishNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleDishNotFoundException(
+            DishNotFoundException ignoredDishNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_NOT_FOUND_EXCEPTION.getMessage()));
+    }
+    
     @ExceptionHandler(DishPriceInvalidException.class)
     public ResponseEntity<Map<String, String>> handleDishPriceInvalidException(
             DishPriceInvalidException ignoredDishPriceInvalidException) {

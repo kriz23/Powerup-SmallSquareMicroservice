@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.input.rest;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IDishHandler;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,10 +25,10 @@ public class DishRestController {
     
     @Operation(summary = "Create a new dish")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Owner created", content = @Content),
-    @ApiResponse(responseCode = "409", description = "Dish already exists", content = @Content)})
+            @ApiResponse(responseCode = "409", description = "Dish already exists", content = @Content)})
     @PostMapping("/restaurants/{id}/dishes")
-    public ResponseEntity<Void> createDish(@Parameter(description = "Restaurant id") @PathVariable Long id, @RequestBody
-                                           DishRequestDto dishRequestDto){
+    public ResponseEntity<Void> createDish(@Parameter(description = "Restaurant id") @PathVariable Long id,
+                                           @RequestBody DishRequestDto dishRequestDto) {
         dishRequestDto.setIdRestaurant(id);
         dishHandler.createDish(dishRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -36,9 +37,19 @@ public class DishRestController {
     @Operation(summary = "Get desired dish by id")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Desired owner returned", content =
     @Content(mediaType = "application/json", schema = @Schema(implementation = DishResponseDto.class))),
-    @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
     @GetMapping("/dishes/{id}")
-    public ResponseEntity<DishResponseDto> getDish(@Parameter(description = "Dish id")@PathVariable Long id){
+    public ResponseEntity<DishResponseDto> getDish(@Parameter(description = "Dish id") @PathVariable Long id) {
         return ResponseEntity.ok(dishHandler.getDish(id));
+    }
+    
+    @Operation(summary = "Update desired dish")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Dish updated", content = @Content),
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/dishes/{id}")
+    public ResponseEntity<Void> updateDish(@Parameter(description = "Dish id") @PathVariable Long id, @RequestBody
+                                           DishUpdateRequestDto dishUpdateRequestDto) {
+        dishHandler.updateDish(id, dishUpdateRequestDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

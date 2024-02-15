@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.application.handler.impl;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IDishHandler;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IDishRequestMapper;
@@ -26,5 +27,10 @@ public class DishHandler implements IDishHandler {
     @Override
     public DishResponseDto getDish(Long idDish) {
         return dishResponseMapper.dishToDishResponseDto(dishServicePort.getDish(idDish));
+    }
+    
+    @Override
+    public void updateDish(Long idDish, DishUpdateRequestDto dishUpdateRequestDto) {
+        dishServicePort.updateDish(idDish, dishUpdateRequestDto);
     }
 }
