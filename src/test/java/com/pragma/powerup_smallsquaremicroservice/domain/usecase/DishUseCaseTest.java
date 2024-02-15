@@ -49,6 +49,16 @@ class DishUseCaseTest {
     }
     
     @Test
+    void updateDish_allValid_callsPersistencePort() {
+        Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"), "Descripción", 10000,
+                             new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573101234567", "www.logo.com",
+                                            1L), "www.image.com", true);
+        when(dishPersistencePort.getDish(1L)).thenReturn(dish);
+        dishUseCase.updateDish(1L, 15000, "Descripción actualizada");
+        verify(dishPersistencePort, times(1)).updateDish(dish);
+    }
+    
+    @Test
     void validateDescription_invalidDescription_throwsException(){
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"), "", 10000,
                              new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573101234567", "www.logo.com",
