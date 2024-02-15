@@ -2,30 +2,18 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IDishServicePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
+import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishPriceInvalidException;
+import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishUrlImageInvalidException;
+import com.pragma.powerup_smallsquaremicroservice.domain.exception.GenericDescriptionInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAlreadyExistsException;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.entity.DishEntity;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.ICategoryRepository;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IDishRepository;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantRepository;
-
-import java.util.List;
 
 public class DishUseCase implements IDishServicePort {
     
     private final IDishPersistencePort dishPersistencePort;
-    private final IRestaurantRepository restaurantRepository;
-    private final ICategoryRepository categoryRepository;
-    private final IDishRepository dishRepository;
     
-    public DishUseCase(IDishPersistencePort dishPersistencePort, IRestaurantRepository restaurantRepository,
-                       ICategoryRepository categoryRepository, IDishRepository dishRepository) {
+    public DishUseCase(IDishPersistencePort dishPersistencePort) {
         this.dishPersistencePort = dishPersistencePort;
-        this.restaurantRepository = restaurantRepository;
-        this.categoryRepository = categoryRepository;
-        this.dishRepository = dishRepository;
     }
     
     @Override
@@ -60,24 +48,12 @@ public class DishUseCase implements IDishServicePort {
     
     @Override
     public boolean validateName(Dish dish) {
-        if (dish.getName().isEmpty()) {
-            throw new GenericNameInvalidException();
-        }
-        List<DishEntity> dishEntityList = dishRepository.findAllByRestaurantEntityId(dish.getRestaurant().getId());
-        dishEntityList.forEach(dishEntity -> {
-            if (dishEntity.getName().equals(dish.getName())) {
-                throw new DishAlreadyExistsException();
-            }
-        });
-        return true;
+        return dishPersistencePort.validateName(dish);
     }
     
     @Override
     public boolean validateCategory(Long idCategory) {
-        if (!categoryRepository.existsById(idCategory)) {
-            throw new CategoryNotFoundException();
-        }
-        return true;
+        return dishPersistencePort.validateCategory(idCategory);
     }
     
     @Override
@@ -98,10 +74,7 @@ public class DishUseCase implements IDishServicePort {
     
     @Override
     public boolean validateRestaurant(Long idRestaurant) {
-        if (!restaurantRepository.existsById(idRestaurant)) {
-            throw new RestaurantNotFoundException();
-        }
-        return true;
+        return dishPersistencePort.validateRestaurant(idRestaurant);
     }
     
     @Override

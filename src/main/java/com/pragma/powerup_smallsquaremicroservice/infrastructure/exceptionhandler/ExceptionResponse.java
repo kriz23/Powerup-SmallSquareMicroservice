@@ -2,6 +2,9 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.exceptionhandl
 
 public enum ExceptionResponse {
     NO_DATA_FOUND("No data found for the requested petition"),
+    // --FEIGN EXCEPTIONS--
+    OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
+    ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
     // DOMAIN EXCEPTIONS
     RESTAURANT_NAME_INVALID_EXCEPTION("The restaurant name you entered is invalid or empty"),
     RESTAURANT_NIT_INVALID_EXCEPTION("The restaurant NIT you entered is invalid or empty"),
