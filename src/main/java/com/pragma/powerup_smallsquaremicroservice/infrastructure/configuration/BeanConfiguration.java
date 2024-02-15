@@ -1,27 +1,27 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.configuration;
 
-import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.ICategoryServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IDishServicePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.usecase.RestaurantUseCase;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.usecase.CategoryUseCase;
 import com.pragma.powerup_smallsquaremicroservice.domain.usecase.DishUseCase;
+import com.pragma.powerup_smallsquaremicroservice.domain.usecase.RestaurantUseCase;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.adapter.UserFeignClientAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.feignclient.IUserFeignClient;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.mapper.IUserMSClientResponseMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.RestaurantJpaAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.CategoryJpaAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.DishJpaAdapter;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.RestaurantJpaAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.ICategoryEntityMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IDishEntityMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantRepository;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.ICategoryRepository;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IDishRepository;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,11 +65,11 @@ public class BeanConfiguration {
     
     @Bean
     public IDishPersistencePort dishPersistencePort(){
-        return new DishJpaAdapter(dishRepository, dishEntityMapper);
+        return new DishJpaAdapter(dishRepository, dishEntityMapper, restaurantRepository, categoryRepository);
     }
     
     @Bean
     public IDishServicePort dishServicePort(){
-        return new DishUseCase(dishPersistencePort(), restaurantRepository, categoryRepository, dishRepository);
+        return new DishUseCase(dishPersistencePort());
     }
 }

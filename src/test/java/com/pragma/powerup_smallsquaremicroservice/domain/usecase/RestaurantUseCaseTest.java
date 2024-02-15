@@ -61,7 +61,7 @@ class RestaurantUseCaseTest {
     void validateName_invalidName_throwsException(){
         String name = "";
         
-        assertThrows(NameInvalidException.class, () -> restaurantUseCase.validateName(name));
+        assertThrows(RestaurantNameInvalidException.class, () -> restaurantUseCase.validateName(name));
     }
     
     @Test
@@ -75,7 +75,7 @@ class RestaurantUseCaseTest {
     void validateNit_invalidNit_throwsException(){
         String nit = "";
         
-        assertThrows(NITInvalidException.class, () -> restaurantUseCase.validateNIT(nit));
+        assertThrows(RestaurantNitInvalidException.class, () -> restaurantUseCase.validateNIT(nit));
     }
     
     @Test
@@ -89,7 +89,7 @@ class RestaurantUseCaseTest {
     void validateAddress_invalidAddress_throwsException(){
         String address = "";
         
-        assertThrows(AddressInvalidException.class, () -> restaurantUseCase.validateAddress(address));
+        assertThrows(RestaurantAddressInvalidException.class, () -> restaurantUseCase.validateAddress(address));
     }
     
     @Test
@@ -103,7 +103,7 @@ class RestaurantUseCaseTest {
     void validatePhone_invalidPhone_throwsException(){
         String phone = "";
         
-        assertThrows(PhoneInvalidException.class, () -> restaurantUseCase.validatePhone(phone));
+        assertThrows(RestaurantPhoneInvalidException.class, () -> restaurantUseCase.validatePhone(phone));
     }
     
     @Test
@@ -117,7 +117,7 @@ class RestaurantUseCaseTest {
     void validateUrlLogo_invalidUrlLogo_throwsException(){
         String urlLogo = "";
         
-        assertThrows(UrlLogoInvalidException.class, () -> restaurantUseCase.validateUrlLogo(urlLogo));
+        assertThrows(RestaurantUrlLogoInvalidException.class, () -> restaurantUseCase.validateUrlLogo(urlLogo));
     }
     
     @Test
@@ -131,7 +131,7 @@ class RestaurantUseCaseTest {
     void validateIdOwner_invalidIdOwner_throwsException(){
         Long idOwner = 0L;
         
-        assertThrows(IdOwnerInvalidException.class, () -> restaurantUseCase.validateIdOwner(idOwner));
+        assertThrows(RestaurantIdOwnerInvalidException.class, () -> restaurantUseCase.validateIdOwner(idOwner));
     }
     
     
