@@ -39,6 +39,11 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
+    public void updateDish(Dish dish) {
+        dishRepository.save(dishEntityMapper.dishToDishEntity(dish));
+    }
+    
+    @Override
     public boolean validateName(Dish dish) {
         if (dish.getName().isEmpty()){
             throw new GenericNameInvalidException();

@@ -1,6 +1,5 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
-import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IDishServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishPriceInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishUrlImageInvalidException;
@@ -34,16 +33,13 @@ public class DishUseCase implements IDishServicePort {
     }
     
     @Override
-    public void updateDish(Long idDish, DishUpdateRequestDto dishUpdateRequestDto) {
-        DishEntity dishEntity = dishRepository.findById(idDish).orElseThrow(DishNotFoundException::new);
-        if (dishRepository.findById(idDish).isPresent() && (validatePrice(
-                dishUpdateRequestDto.getPrice()) && validateDescription(dishUpdateRequestDto.getDescription()))) {
-            dishEntity.setPrice(dishUpdateRequestDto.getPrice());
-            dishEntity.setDescription(dishUpdateRequestDto.getDescription());
-            dishRepository.save(dishEntity);
-            
+    public void updateDish(Long idDish, int dishPrice, String dishDescription) {
+        Dish existingDish = getDish(idDish);
+        if (validatePrice(dishPrice) && validateDescription(dishDescription)){
+            existingDish.setPrice(dishPrice);
+            existingDish.setDescription(dishDescription);
+            dishPersistencePort.updateDish(existingDish);
         }
-        
     }
     
     @Override

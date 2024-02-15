@@ -31,6 +31,6 @@ public class DishHandler implements IDishHandler {
     
     @Override
     public void updateDish(Long idDish, DishUpdateRequestDto dishUpdateRequestDto) {
-        dishServicePort.updateDish(idDish, dishUpdateRequestDto);
+        dishServicePort.updateDish(idDish, dishUpdateRequestDto.getPrice(), dishUpdateRequestDto.getDescription());
     }
 }
