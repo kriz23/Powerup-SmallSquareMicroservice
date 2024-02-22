@@ -14,7 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Tag(name = "Dish Rest Controller", description = "Rest controller for dish operations")
 @RestController
@@ -27,10 +30,12 @@ public class DishRestController {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Owner created", content = @Content),
             @ApiResponse(responseCode = "409", description = "Dish already exists", content = @Content)})
     @PostMapping("/restaurants/{id}/dishes")
+    @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<Void> createDish(@Parameter(description = "Restaurant id") @PathVariable Long id,
-                                           @RequestBody DishRequestDto dishRequestDto) {
+                                           @RequestBody DishRequestDto dishRequestDto,
+                                           HttpServletRequest request) {
         dishRequestDto.setIdRestaurant(id);
-        dishHandler.createDish(dishRequestDto);
+        dishHandler.createDish(dishRequestDto, request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
@@ -39,17 +44,21 @@ public class DishRestController {
     @Content(mediaType = "application/json", schema = @Schema(implementation = DishResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
     @GetMapping("/dishes/{id}")
+    @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<DishResponseDto> getDish(@Parameter(description = "Dish id") @PathVariable Long id) {
-        return ResponseEntity.ok(dishHandler.getDish(id));
+        return ResponseEntity.ok(dishHandler.getDishById(id));
     }
     
     @Operation(summary = "Update desired dish")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Dish updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
     @PutMapping("/dishes/{id}")
-    public ResponseEntity<Void> updateDish(@Parameter(description = "Dish id") @PathVariable Long id, @RequestBody
-                                           DishUpdateRequestDto dishUpdateRequestDto) {
-        dishHandler.updateDish(id, dishUpdateRequestDto);
+    @PreAuthorize("hasRole('PROPIETARIO')")
+    public ResponseEntity<Void> updateDish(@Parameter(description = "Dish id")
+                                           @PathVariable Long id,
+                                           @RequestBody DishUpdateRequestDto dishUpdateRequestDto,
+                                           HttpServletRequest request) {
+        dishHandler.updateDish(id, dishUpdateRequestDto, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

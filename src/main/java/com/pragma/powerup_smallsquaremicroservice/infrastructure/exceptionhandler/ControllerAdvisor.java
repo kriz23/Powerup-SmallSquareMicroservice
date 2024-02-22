@@ -25,6 +25,20 @@ public class ControllerAdvisor {
     }
     
     // DOMAIN EXCEPTIONS
+    @ExceptionHandler(UnauthorizedRoleException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorizedRoleException(
+            UnauthorizedRoleException ignoredUnauthorizedRoleException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.UNAUTHORIZED_ROLE_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(RestaurantOwnershipInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleOwnershipInvalidException(
+            RestaurantOwnershipInvalidException ignoredRestaurantOwnershipInvalidException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_OWNERSHIP_INVALID_EXCEPTION.getMessage()));
+    }
+    
     @ExceptionHandler(RestaurantNameInvalidException.class)
     public ResponseEntity<Map<String, String>> handleNameInvalidException(
             RestaurantNameInvalidException ignoredRestaurantNameInvalidException) {

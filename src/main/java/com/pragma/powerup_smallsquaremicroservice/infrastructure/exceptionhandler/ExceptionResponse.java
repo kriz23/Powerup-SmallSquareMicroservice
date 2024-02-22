@@ -2,10 +2,9 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.exceptionhandl
 
 public enum ExceptionResponse {
     NO_DATA_FOUND("No data found for the requested petition"),
-    // --FEIGN EXCEPTIONS--
-    OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
-    ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
     // DOMAIN EXCEPTIONS
+    UNAUTHORIZED_ROLE_EXCEPTION("Your current role is not allowed for this operation"),
+    RESTAURANT_OWNERSHIP_INVALID_EXCEPTION("You cannot perform this operation because you are not the owner of the restaurant"),
     RESTAURANT_NAME_INVALID_EXCEPTION("The restaurant name you entered is invalid or empty"),
     RESTAURANT_NIT_INVALID_EXCEPTION("The restaurant NIT you entered is invalid or empty"),
     RESTAURANT_ADDRESS_INVALID_EXCEPTION("The restaurant address you entered is invalid or empty"),
@@ -19,6 +18,9 @@ public enum ExceptionResponse {
     DISH_NOT_FOUND_EXCEPTION("The dish you are looking for does not exist"),
     DISH_PRICE_INVALID_EXCEPTION("The price you entered is invalid or empty"),
     DISH_URL_IMAGE_INVALID_EXCEPTION("The dish image URL you entered is invalid or empty"),
+    // --FEIGN EXCEPTIONS--
+    OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
+    ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
     // INFRASTRUCTURE EXCEPTIONS
     RESTAURANT_ALREADY_EXISTS_EXCEPTION("A restaurant with that NIT already exists"),
     DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists in the restaurant");

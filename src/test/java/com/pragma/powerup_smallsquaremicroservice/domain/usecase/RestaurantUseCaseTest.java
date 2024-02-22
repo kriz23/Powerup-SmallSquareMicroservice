@@ -143,7 +143,7 @@ class RestaurantUseCaseTest {
                               new Role(2L, "OWNER", "Owner"));
         when(userMSClientPort.getOwnerById(1L)).thenReturn(owner);
         
-        assertTrue(restaurantUseCase.validateOwnerRole(1L));
+        assertTrue(restaurantUseCase.validateOwnerRoleFromRequest(1L));
     }
     
     @Test
@@ -154,13 +154,13 @@ class RestaurantUseCaseTest {
                               new Role(1L, "OWNER", "Owner"));
         when(userMSClientPort.getOwnerById(1L)).thenReturn(owner);
         
-        assertThrows(RoleNotAllowedException.class, () -> restaurantUseCase.validateOwnerRole(1L));
+        assertThrows(RoleNotAllowedException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(1L));
     }
     
     @Test
     void validateOwnerRole_invalidIdOwner_throwsException2(){
         when(userMSClientPort.getOwnerById(1L)).thenThrow(FeignException.FeignClientException.class);;
         
-        assertThrows(OwnerNotFoundException.class, () -> restaurantUseCase.validateOwnerRole(1L));
+        assertThrows(OwnerNotFoundException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(1L));
     }
 }

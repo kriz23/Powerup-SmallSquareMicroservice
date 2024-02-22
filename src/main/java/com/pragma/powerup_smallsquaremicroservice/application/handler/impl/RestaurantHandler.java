@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -19,8 +21,9 @@ public class RestaurantHandler implements IRestaurantHandler {
     private final IRestaurantResponseMapper restaurantResponseMapper;
     
     @Override
-    public void createRestaurant(RestaurantRequestDto restaurantRequestDto) {
-        restaurantServicePort.createRestaurant(
+    public void createRestaurant(RestaurantRequestDto restaurantRequestDto, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        restaurantServicePort.createRestaurant(authHeader,
                 restaurantRequestMapper.restaurantRequestDtoToRestaurant(restaurantRequestDto));
     }
 }

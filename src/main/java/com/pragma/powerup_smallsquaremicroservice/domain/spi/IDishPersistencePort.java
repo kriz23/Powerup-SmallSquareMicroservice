@@ -4,9 +4,9 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 
 public interface IDishPersistencePort {
     void createDish(Dish dish);
-    Dish getDish(Long idDish);
+    Dish getDishById(Long idDish);
     void updateDish(Dish dish);
     boolean validateName(Dish dish);
-    boolean validateCategory(Long idCategory);
-    boolean validateRestaurant(Long idRestaurant);
+    boolean validateCategoryExists(Long idCategory);
+    boolean validateRestaurantExists(Long idRestaurant);
 }

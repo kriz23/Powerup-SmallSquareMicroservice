@@ -2,6 +2,7 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.configuration;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.ICategoryServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IDishServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class BeanConfiguration {
+    private final IJwtServicePort jwtServicePort;
     private final IUserFeignClient userFeignClient;
     private final IUserMSClientResponseMapper userMSClientResponseMapper;
     private final IRestaurantRepository restaurantRepository;
@@ -50,7 +52,7 @@ public class BeanConfiguration {
     
     @Bean
     public IRestaurantServicePort restaurantServicePort() {
-        return new RestaurantUseCase(restaurantPersistencePort(), userMSClientPort());
+        return new RestaurantUseCase(restaurantPersistencePort(), userMSClientPort(), jwtServicePort);
     }
     
     @Bean
@@ -70,6 +72,6 @@ public class BeanConfiguration {
     
     @Bean
     public IDishServicePort dishServicePort(){
-        return new DishUseCase(dishPersistencePort());
+        return new DishUseCase(dishPersistencePort(), restaurantPersistencePort(), userMSClientPort(), jwtServicePort);
     }
 }

@@ -33,7 +33,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
-    public Dish getDish(Long idDish) {
+    public Dish getDishById(Long idDish) {
         DishEntity dishEntity = dishRepository.findById(idDish).orElseThrow(NoDataFoundException::new);
         return dishEntityMapper.dishEntityToDish(dishEntity);
     }
@@ -58,7 +58,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
-    public boolean validateCategory(Long idCategory) {
+    public boolean validateCategoryExists(Long idCategory) {
         if (!categoryRepository.existsById(idCategory)){
             throw new CategoryNotFoundException();
         }
@@ -66,7 +66,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
-    public boolean validateRestaurant(Long idRestaurant) {
+    public boolean validateRestaurantExists(Long idRestaurant) {
         if (!restaurantRepository.existsById(idRestaurant)){
             throw new RestaurantNotFoundException();
         }

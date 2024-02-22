@@ -16,6 +16,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+security:
+  jwt:
+    secret-key: 7A6B62356D376F396C423974423F4428482B4E6252655568774A2F536B593468
+
 appDescription: "Pragma Powerup"
 appVersion: "1.0.0"
 

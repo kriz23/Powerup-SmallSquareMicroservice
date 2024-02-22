@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
@@ -10,21 +11,27 @@ import feign.FeignException;
 import java.util.regex.Pattern;
 
 public class RestaurantUseCase implements IRestaurantServicePort {
+    private static final Long ADMIN_ROLE_ID = 1L;
     private static final Long OWNER_ROLE_ID = 2L;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IUserMSClientPort userMSClientPort;
+    private final IJwtServicePort jwtServicePort;
     
-    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IUserMSClientPort userMSClientPort) {
+    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort,
+                             IUserMSClientPort userMSClientPort,
+                             IJwtServicePort jwtServicePort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.userMSClientPort = userMSClientPort;
+        this.jwtServicePort = jwtServicePort;
     }
     
     
     @Override
-    public void createRestaurant(Restaurant restaurant) {
-        if (validateName(restaurant.getName()) && validateNIT(restaurant.getNit()) && validateAddress(
-                restaurant.getAddress()) && validatePhone(restaurant.getPhone()) && validateUrlLogo(
-                restaurant.getUrlLogo()) && validateOwnerRole(restaurant.getIdOwner())) {
+    public void createRestaurant(String authHeader, Restaurant restaurant) {
+        if (validateRequestAdminRole(authHeader) && validateName(restaurant.getName())
+                && validateNIT(restaurant.getNit()) && validateAddress(restaurant.getAddress())
+                && validatePhone(restaurant.getPhone()) && validateUrlLogo(restaurant.getUrlLogo())
+                && validateOwnerRoleFromRequest(authHeader, restaurant.getIdOwner())) {
             restaurantPersistencePort.createRestaurant(restaurant);
         }
     }
@@ -82,15 +89,24 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
     
     @Override
-    public boolean validateOwnerRole(Long idOwner) {
+    public boolean validateOwnerRoleFromRequest(String authHeader, Long idOwner) {
         if (validateIdOwner(idOwner)) {
             try {
-                if (!OWNER_ROLE_ID.equals(userMSClientPort.getOwnerById(idOwner).getRole().getId())){
+                if (!OWNER_ROLE_ID.equals(userMSClientPort.getOwnerById(authHeader, idOwner).getRole().getId())){
                     throw new RoleNotAllowedException();
                 }
             } catch (FeignException.FeignClientException e){
                 throw new OwnerNotFoundException();
             }
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean validateRequestAdminRole(String authHeader) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        if (!ADMIN_ROLE_ID.equals(userMSClientPort.getUserByMail(authHeader, requestUserMail).getRole().getId())) {
+            throw new UnauthorizedRoleException();
         }
         return true;
     }
