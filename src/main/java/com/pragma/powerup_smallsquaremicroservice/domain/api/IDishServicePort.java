@@ -10,7 +10,5 @@ public interface IDishServicePort {
     boolean validateCategoryExists(Long idCategory);
     boolean validateDescription(String description);
     boolean validatePrice(int price);
-    boolean validateRestaurantExists(Long idRestaurant);
     boolean validateUrlImage(String urlImage);
-    boolean validateRestaurantOwnership(String authHeader, Long idRestaurant);
 }

@@ -26,4 +26,10 @@ public class RestaurantHandler implements IRestaurantHandler {
         restaurantServicePort.createRestaurant(authHeader,
                 restaurantRequestMapper.restaurantRequestDtoToRestaurant(restaurantRequestDto));
     }
+    
+    @Override
+    public boolean validateRestaurantOwnership(Long idRestaurant, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return restaurantServicePort.validateRestaurantOwnership(authHeader, idRestaurant);
+    }
 }

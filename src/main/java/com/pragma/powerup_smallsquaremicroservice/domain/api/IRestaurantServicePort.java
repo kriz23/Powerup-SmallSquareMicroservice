@@ -13,4 +13,6 @@ public interface IRestaurantServicePort {
     boolean validateIdOwner(Long idOwner);
     boolean validateOwnerRoleFromRequest(String authHeader, Long idOwner);
     boolean validateRequestAdminRole(String authHeader);
+    boolean validateRestaurantOwnership(String authHeader, Long idRestaurant);
+    boolean validateRestaurantOwnershipInternal(String authHeader, Long idRestaurant);
 }

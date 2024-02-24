@@ -8,5 +8,4 @@ public interface IDishPersistencePort {
     void updateDish(Dish dish);
     boolean validateName(Dish dish);
     boolean validateCategoryExists(Long idCategory);
-    boolean validateRestaurantExists(Long idRestaurant);
 }

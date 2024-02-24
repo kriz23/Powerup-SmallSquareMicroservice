@@ -2,7 +2,6 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapte
 
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.CategoryNotFoundException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.GenericNameInvalidException;
-import com.pragma.powerup_smallsquaremicroservice.domain.exception.RestaurantNotFoundException;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAlreadyExistsException;
@@ -26,7 +25,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
     
     @Override
     public void createDish(Dish dish) {
-        if (dishRepository.findByName(dish.getName()).isPresent()){
+        if (dishRepository.findByName(dish.getName()).isPresent()) {
             throw new DishAlreadyExistsException();
         }
         dishRepository.save(dishEntityMapper.dishToDishEntity(dish));
@@ -45,12 +44,12 @@ public class DishJpaAdapter implements IDishPersistencePort {
     
     @Override
     public boolean validateName(Dish dish) {
-        if (dish.getName().isEmpty()){
+        if (dish.getName().isEmpty()) {
             throw new GenericNameInvalidException();
         }
         List<DishEntity> dishEntityList = dishRepository.findAllByRestaurantEntityId(dish.getRestaurant().getId());
         dishEntityList.forEach(dishEntity -> {
-            if(dishEntity.getName().equals(dish.getName())){
+            if (dishEntity.getName().equals(dish.getName())) {
                 throw new DishAlreadyExistsException();
             }
         });
@@ -59,16 +58,8 @@ public class DishJpaAdapter implements IDishPersistencePort {
     
     @Override
     public boolean validateCategoryExists(Long idCategory) {
-        if (!categoryRepository.existsById(idCategory)){
+        if (!categoryRepository.existsById(idCategory)) {
             throw new CategoryNotFoundException();
-        }
-        return true;
-    }
-    
-    @Override
-    public boolean validateRestaurantExists(Long idRestaurant) {
-        if (!restaurantRepository.existsById(idRestaurant)){
-            throw new RestaurantNotFoundException();
         }
         return true;
     }

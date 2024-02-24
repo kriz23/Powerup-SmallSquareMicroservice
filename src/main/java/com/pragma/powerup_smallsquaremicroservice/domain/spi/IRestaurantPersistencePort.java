@@ -5,4 +5,5 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 public interface IRestaurantPersistencePort {
     void createRestaurant(Restaurant restaurant);
     Restaurant getRestaurantById(Long idRestaurant);
+    boolean validateRestaurantExists(Long idRestaurant);
 }

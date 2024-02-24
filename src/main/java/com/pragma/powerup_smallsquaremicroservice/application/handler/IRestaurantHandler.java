@@ -6,4 +6,5 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface IRestaurantHandler {
     void createRestaurant(RestaurantRequestDto restaurantRequestDto, HttpServletRequest request);
+    boolean validateRestaurantOwnership(Long idRestaurant, HttpServletRequest request);
 }

@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.exception.RestaurantNotFoundException;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
@@ -28,5 +29,13 @@ public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
         RestaurantEntity restaurantEntity = restaurantRepository.findById(idRestaurant).orElseThrow(
                 NoDataFoundException::new);
         return restaurantEntityMapper.restaurantEntityToRestaurant(restaurantEntity);
+    }
+    
+    @Override
+    public boolean validateRestaurantExists(Long idRestaurant) {
+        if (!restaurantRepository.existsById(idRestaurant)){
+            throw new RestaurantNotFoundException();
+        }
+        return true;
     }
 }

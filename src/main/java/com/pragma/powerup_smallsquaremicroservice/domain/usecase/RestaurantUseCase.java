@@ -5,6 +5,7 @@ import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServiceP
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
+import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import feign.FeignException;
 
@@ -109,5 +110,24 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             throw new UnauthorizedRoleException();
         }
         return true;
+    }
+    
+    @Override
+    public boolean validateRestaurantOwnership(String authHeader, Long idRestaurant) {
+        if (restaurantPersistencePort.validateRestaurantExists(idRestaurant)){
+            String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+            User requestUser = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+            Restaurant currentRestaurant = restaurantPersistencePort.getRestaurantById(idRestaurant);
+            return currentRestaurant.getIdOwner().equals(requestUser.getId());
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean validateRestaurantOwnershipInternal(String authHeader, Long idRestaurant) {
+        if (!validateRestaurantOwnership(authHeader, idRestaurant)){
+            throw new RestaurantOwnershipInvalidException();
+        }
+        return false;
     }
 }
