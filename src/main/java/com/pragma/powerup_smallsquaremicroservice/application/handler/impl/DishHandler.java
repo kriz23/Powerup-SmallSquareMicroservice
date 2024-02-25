@@ -37,4 +37,10 @@ public class DishHandler implements IDishHandler {
         String authHeader = request.getHeader("Authorization");
         dishServicePort.updateDish(authHeader, idDish, dishUpdateRequestDto.getPrice(),dishUpdateRequestDto.getDescription());
     }
+    
+    @Override
+    public void updateDishStatus(Long idDish, boolean status, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        dishServicePort.updateDishStatus(authHeader, idDish, status);
+    }
 }

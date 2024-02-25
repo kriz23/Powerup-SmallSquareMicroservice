@@ -48,6 +48,16 @@ public class DishUseCase implements IDishServicePort {
     }
     
     @Override
+    public void updateDishStatus(String authHeader, Long idDish, boolean status) {
+        Dish existingDish = getDishById(idDish);
+        if (restaurantServicePort.validateRestaurantOwnershipInternal(authHeader,
+                                                                      existingDish.getRestaurant().getId())){
+            existingDish.setAvailable(status);
+            dishPersistencePort.updateDish(existingDish);
+        }
+    }
+    
+    @Override
     public boolean validateName(Dish dish) {
         return dishPersistencePort.validateName(dish);
     }
