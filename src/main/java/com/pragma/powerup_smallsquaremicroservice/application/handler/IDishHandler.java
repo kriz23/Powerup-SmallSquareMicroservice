@@ -10,4 +10,5 @@ public interface IDishHandler {
     void createDish(DishRequestDto dishRequestDto, HttpServletRequest request);
     DishResponseDto getDishById(Long idDish);
     void updateDish(Long idDish, DishUpdateRequestDto dishUpdateRequestDto, HttpServletRequest request);
+    void updateDishStatus(Long idDish, boolean status, HttpServletRequest request);
 }

@@ -6,6 +6,7 @@ public interface IDishServicePort {
     void createDish(String authHeader, Dish dish);
     Dish getDishById(Long idDish);
     void updateDish(String authHeader, Long idDish, int dishPrice, String dishDescription);
+    void updateDishStatus(String authHeader, Long idDish, boolean status);
     boolean validateName(Dish dish);
     boolean validateCategoryExists(Long idCategory);
     boolean validateDescription(String description);

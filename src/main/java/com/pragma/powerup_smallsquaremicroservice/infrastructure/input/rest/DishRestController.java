@@ -4,6 +4,7 @@ import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishRe
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.DishUpdateRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IDishHandler;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAvailableStatusInvalidException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -60,5 +61,22 @@ public class DishRestController {
                                            HttpServletRequest request) {
         dishHandler.updateDish(id, dishUpdateRequestDto, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @Operation(summary = "Update desired dish status")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Dish status updated", content = @Content),
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/dishes/enable-disable/{id}")
+    @PreAuthorize("hasRole('PROPIETARIO')")
+    public ResponseEntity<Void> updateDishStatus(@Parameter(description = "Dish id") @PathVariable Long id,
+                                                 @Parameter(description = "Dish status") @RequestParam String dishAvailableStatus,
+                                                 HttpServletRequest request) {
+        if (dishAvailableStatus.equalsIgnoreCase("true") || dishAvailableStatus.equalsIgnoreCase("false")){
+            boolean status = Boolean.parseBoolean(dishAvailableStatus);
+            dishHandler.updateDishStatus(id, status, request);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            throw new DishAvailableStatusInvalidException();
+        }
     }
 }

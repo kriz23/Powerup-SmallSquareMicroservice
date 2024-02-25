@@ -2,6 +2,7 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.exceptionhandl
 
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAlreadyExistsException;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAvailableStatusInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.RestaurantAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -158,6 +159,13 @@ public class ControllerAdvisor {
             DishAlreadyExistsException ignoredDishAlreadyExistsException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_ALREADY_EXISTS_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(DishAvailableStatusInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleDishAvailableStatusInvalidException(
+            DishAvailableStatusInvalidException ignoredDishAvailableStatusInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_AVAILABLE_STATUS_INVALID_EXCEPTION.getMessage()));
     }
     
 }
