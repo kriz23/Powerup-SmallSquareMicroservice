@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishPriceInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishUrlImageInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.GenericDescriptionInvalidException;
@@ -22,40 +23,46 @@ class DishUseCaseTest {
     @Mock
     private IDishPersistencePort dishPersistencePort;
     
+    @Mock
+    private IRestaurantServicePort restaurantServicePort;
+    
     @InjectMocks
     private DishUseCase dishUseCase;
     
     @BeforeEach
     void setUp() {
-        dishUseCase = new DishUseCase(dishPersistencePort);
+        dishUseCase = new DishUseCase(dishPersistencePort, restaurantServicePort);
     }
     
     @Test
     void createDish_allValid_callsPersistencePort() {
+        String authHeader = "validHeader";
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"), "Descripción", 10000,
                              new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573101234567", "www.logo.com",
                                             1L), "www.image.com", true);
         when(dishPersistencePort.validateName(dish)).thenReturn(true);
-        when(dishPersistencePort.validateCategory(dish.getCategory().getId())).thenReturn(true);
-        when(dishPersistencePort.validateRestaurant(dish.getRestaurant().getId())).thenReturn(true);
-        dishUseCase.createDish(dish);
+        when(dishPersistencePort.validateCategoryExists(dish.getCategory().getId())).thenReturn(true);
+        when(restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, dish.getRestaurant().getId())).thenReturn(true);
+        dishUseCase.createDish(authHeader, dish);
         verify(dishPersistencePort, times(1)).createDish(dish);
     }
     
     @Test
     void getDish_callsPersistencePort() {
-        dishUseCase.getDish(1L);
-        verify(dishPersistencePort, times(1)).getDish(1L);
+        dishUseCase.getDishById(1L);
+        verify(dishPersistencePort, times(1)).getDishById(1L);
     }
     
     @Test
     void updateDish_allValid_callsPersistencePort() {
-        Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"), "Descripción", 10000,
+        String authHeader = "validHeader";
+        Dish existingDish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"), "Descripción", 10000,
                              new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573101234567", "www.logo.com",
                                             1L), "www.image.com", true);
-        when(dishPersistencePort.getDish(1L)).thenReturn(dish);
-        dishUseCase.updateDish(1L, 15000, "Descripción actualizada");
-        verify(dishPersistencePort, times(1)).updateDish(dish);
+        when(dishPersistencePort.getDishById(1L)).thenReturn(existingDish);
+        when(restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, existingDish.getRestaurant().getId())).thenReturn(true);
+        dishUseCase.updateDish(authHeader, 1L, 15000, "Descripción actualizada");
+        verify(dishPersistencePort, times(1)).updateDish(existingDish);
     }
     
     @Test

@@ -3,14 +3,16 @@ package com.pragma.powerup_smallsquaremicroservice.application.dto.response;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class OwnerResponseDto {
+public class UserMSResponseDto {
     private Long id;
     private String name;
     private String surname;

@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IDishServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishPriceInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.DishUrlImageInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.GenericDescriptionInvalidException;
@@ -10,35 +11,39 @@ import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePor
 public class DishUseCase implements IDishServicePort {
     
     private final IDishPersistencePort dishPersistencePort;
+    private final IRestaurantServicePort restaurantServicePort;
     
-    public DishUseCase(IDishPersistencePort dishPersistencePort) {
+    public DishUseCase(IDishPersistencePort dishPersistencePort,
+                       IRestaurantServicePort restaurantServicePort) {
         this.dishPersistencePort = dishPersistencePort;
+        this.restaurantServicePort = restaurantServicePort;
     }
     
     @Override
-    public void createDish(Dish dish) {
+    public void createDish(String authHeader, Dish dish) {
         dish.setAvailable(true);
         
-        if (validateName(dish) && validateCategory(dish.getCategory().getId()) && validateDescription(
-                dish.getDescription()) && validatePrice(dish.getPrice()) && validateRestaurant(
-                dish.getRestaurant().getId()) && validateUrlImage(dish.getUrlImage())) {
+        if (restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, dish.getRestaurant().getId()) && validateName(dish)
+                && validateCategoryExists(dish.getCategory().getId()) && validateDescription(dish.getDescription())
+                && validatePrice(dish.getPrice()) && validateUrlImage(dish.getUrlImage())) {
             dishPersistencePort.createDish(dish);
         }
         
     }
     
     @Override
-    public Dish getDish(Long idDish) {
-        return dishPersistencePort.getDish(idDish);
+    public Dish getDishById(Long idDish) {
+        return dishPersistencePort.getDishById(idDish);
     }
     
     @Override
-    public void updateDish(Long idDish, int dishPrice, String dishDescription) {
-        Dish existingDish = getDish(idDish);
-        if (validatePrice(dishPrice) && validateDescription(dishDescription)){
-            existingDish.setPrice(dishPrice);
-            existingDish.setDescription(dishDescription);
-            dishPersistencePort.updateDish(existingDish);
+    public void updateDish(String authHeader, Long idDish, int dishPrice, String dishDescription) {
+        Dish existingDish = getDishById(idDish);
+        if (restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, existingDish.getRestaurant().getId())
+            && (validatePrice(dishPrice) && validateDescription(dishDescription))) {
+                existingDish.setPrice(dishPrice);
+                existingDish.setDescription(dishDescription);
+                dishPersistencePort.updateDish(existingDish);
         }
     }
     
@@ -48,8 +53,8 @@ public class DishUseCase implements IDishServicePort {
     }
     
     @Override
-    public boolean validateCategory(Long idCategory) {
-        return dishPersistencePort.validateCategory(idCategory);
+    public boolean validateCategoryExists(Long idCategory) {
+        return dishPersistencePort.validateCategoryExists(idCategory);
     }
     
     @Override
@@ -66,11 +71,6 @@ public class DishUseCase implements IDishServicePort {
             throw new DishPriceInvalidException();
         }
         return true;
-    }
-    
-    @Override
-    public boolean validateRestaurant(Long idRestaurant) {
-        return dishPersistencePort.validateRestaurant(idRestaurant);
     }
     
     @Override

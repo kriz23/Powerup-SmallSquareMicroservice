@@ -13,7 +13,13 @@ public class UserFeignClientAdapter implements IUserMSClientPort {
     private final IUserMSClientResponseMapper userMSClientResponseMapper;
     
     @Override
-    public User getOwnerById(Long id) {
-        return userMSClientResponseMapper.ownerResponseDtoToUser(userFeignClient.getOwnerById(id));
+    public User getOwnerById(String authHeader, Long id) {
+        return userMSClientResponseMapper.userMSResponseDtoToUser(userFeignClient.getOwnerById(authHeader, id));
     }
+    
+    @Override
+    public User getUserByMail(String authHeader, String mail) {
+        return userMSClientResponseMapper.userMSResponseDtoToUser(userFeignClient.getUserByMail(authHeader, mail));
+    }
+    
 }
