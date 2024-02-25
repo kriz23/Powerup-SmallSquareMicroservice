@@ -125,9 +125,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     
     @Override
     public boolean validateRestaurantOwnershipInternal(String authHeader, Long idRestaurant) {
-        if (!validateRestaurantOwnership(authHeader, idRestaurant)){
+        if (validateRestaurantOwnership(authHeader, idRestaurant)){
+            return true;
+        } else {
             throw new RestaurantOwnershipInvalidException();
         }
-        return false;
     }
 }

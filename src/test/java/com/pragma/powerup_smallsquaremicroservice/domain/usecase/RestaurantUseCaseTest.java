@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
@@ -7,7 +8,6 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.Role;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import feign.FeignException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,8 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,23 +28,31 @@ class RestaurantUseCaseTest {
     @Mock
     private IUserMSClientPort userMSClientPort;
     
+    @Mock
+    private IJwtServicePort jwtServicePort;
+    
     @InjectMocks
     private RestaurantUseCase restaurantUseCase;
     
-    @BeforeEach
-    void setUp(){
-        restaurantUseCase = new RestaurantUseCase(restaurantPersistencePort, userMSClientPort);
-    }
-    
     @Test
     void createRestaurant_allValid_CallsPersistencePort(){
-        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573101234567", "www.logo.com", 1L);
-        User owner = new User(1L, "John", "Doe", "123456789", "+573101234567",
-                              LocalDate.of(2000, 1, 1), "john.doe@gmail.com",
-                              "$2a$10$Pl5xVXG4JkXsJZ4krcIMAuDIDNCk8HKqeJYQ8gUjE64QfHjR0aSeu",
-                              new Role(2L, "OWNER", "Owner"));
-        when(userMSClientPort.getOwnerById(1L)).thenReturn(owner);
-        restaurantUseCase.createRestaurant(restaurant);
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(1L, "John", "Doe","123456789","+573101234567",
+                                    LocalDate.of(2000, 1, 1),"admin@mail.com", "password",
+                                     new Role(1L, "ROLE_ADMIN", "Admin")));
+        when(userMSClientPort.getOwnerById(authHeader, 2L))
+                .thenReturn(new User(2L, "John", "Doe","987654321","+573101234455",
+                                    LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        
+        restaurantUseCase.createRestaurant(authHeader, restaurant);
         
         verify(restaurantPersistencePort, times(1)).createRestaurant(restaurant);
     }
@@ -136,31 +143,138 @@ class RestaurantUseCaseTest {
     
     
     @Test
-    void validateOwnerRole_validIdOwner_returnsTrue(){
+    void validateOwnerRoleFromRequest_validIdOwner_returnsTrue(){
+        String authHeader = "validHeader";
         User owner = new User(1L, "John", "Doe", "123456789", "+573101234567",
                               LocalDate.of(2000, 1, 1), "john.doe@gmail.com",
                               "$2a$10$Pl5xVXG4JkXsJZ4krcIMAuDIDNCk8HKqeJYQ8gUjE64QfHjR0aSeu",
-                              new Role(2L, "OWNER", "Owner"));
-        when(userMSClientPort.getOwnerById(1L)).thenReturn(owner);
+                              new Role(2L, "ROLE_PROPIETARIO", "Propietario"));
+        when(userMSClientPort.getOwnerById(authHeader, 1L)).thenReturn(owner);
         
-        assertTrue(restaurantUseCase.validateOwnerRoleFromRequest(1L));
+        assertTrue(restaurantUseCase.validateOwnerRoleFromRequest(authHeader, 1L));
     }
     
     @Test
-    void validateOwnerRole_invalidIdOwner_throwsException(){
+    void validateOwnerRoleFromRequest_invalidIdOwner_throwsException(){
+        String authHeader = "validHeader";
         User owner = new User(1L, "John", "Doe", "123456789", "+573101234567",
                               LocalDate.of(2000, 1, 1), "john.doe@gmail.com",
                               "$2a$10$Pl5xVXG4JkXsJZ4krcIMAuDIDNCk8HKqeJYQ8gUjE64QfHjR0aSeu",
-                              new Role(1L, "OWNER", "Owner"));
-        when(userMSClientPort.getOwnerById(1L)).thenReturn(owner);
+                              new Role(1L, "ROLE_ADMIN", "Admin"));
+        when(userMSClientPort.getOwnerById(authHeader, 1L)).thenReturn(owner);
         
-        assertThrows(RoleNotAllowedException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(1L));
+        assertThrows(RoleNotAllowedException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(authHeader,
+                                                                                                         1L));
     }
     
     @Test
-    void validateOwnerRole_invalidIdOwner_throwsException2(){
-        when(userMSClientPort.getOwnerById(1L)).thenThrow(FeignException.FeignClientException.class);;
+    void validateOwnerRoleFromRequest_invalidIdOwner_throwsException2(){
+        String authHeader = "validHeader";
+        when(userMSClientPort.getOwnerById(authHeader, 1L)).thenThrow(FeignException.FeignClientException.class);;
         
-        assertThrows(OwnerNotFoundException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(1L));
+        assertThrows(OwnerNotFoundException.class, () -> restaurantUseCase.validateOwnerRoleFromRequest(authHeader,
+                                                                                                        1L));
+    }
+    
+    @Test
+    void validateRequestAdminRole_invalidRole_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(1L, "John", "Doe","123456789","+573101234567",
+                                    LocalDate.of(2000, 1, 1),"admin@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        assertThrows(UnauthorizedRoleException.class, () -> restaurantUseCase.validateRequestAdminRole(authHeader));
+    }
+    
+    @Test
+    void validateRestaurantOwnership_validOwnership_returnsTrue(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        String requestUserMail = "validRequestUserMail";
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(2L, "John", "Doe","987654321","+573101234455",
+                                     LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        
+        assertTrue(restaurantUseCase.validateRestaurantOwnership(authHeader, 1L));
+    }
+    
+    @Test
+    void validateRestaurantOwnership_invalidOwnership_returnsFalse(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 3L);
+        String requestUserMail = "validRequestUserMail";
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(2L, "John", "Doe","987654321","+573101234455",
+                                     LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        
+        assertFalse(restaurantUseCase.validateRestaurantOwnership(authHeader, 1L));
+    }
+    
+    @Test
+    void validateRestaurantOwnership_restaurantDoesNotExists_returnsFalse(){
+        String authHeader = "validHeader";
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(false);
+        
+        assertFalse(restaurantUseCase.validateRestaurantOwnership(authHeader, 1L));
+    }
+    
+    @Test
+    void validateRestaurantOwnershipInternal_validOwnership_returnsTrue(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        String requestUserMail = "validRequestUserMail";
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(2L, "John", "Doe","987654321","+573101234455",
+                                     LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        
+        assertTrue(restaurantUseCase.validateRestaurantOwnershipInternal(authHeader, 1L));
+    }
+    
+    @Test
+    void validateRestaurantOwnershipInternal_invalidOwnership_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 3L);
+        String requestUserMail = "validRequestUserMail";
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(2L, "John", "Doe","987654321","+573101234455",
+                                     LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        
+        assertThrows(RestaurantOwnershipInvalidException.class, () -> restaurantUseCase.validateRestaurantOwnershipInternal(authHeader, 1L));
     }
 }
