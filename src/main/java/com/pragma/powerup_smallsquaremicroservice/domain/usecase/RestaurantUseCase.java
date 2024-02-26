@@ -8,6 +8,7 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import feign.FeignException;
+import org.springframework.data.domain.Page;
 
 import java.util.regex.Pattern;
 
@@ -35,6 +36,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
                 && validateOwnerRoleFromRequest(authHeader, restaurant.getIdOwner())) {
             restaurantPersistencePort.createRestaurant(restaurant);
         }
+    }
+    
+    @Override
+    public Page<Restaurant> getAllRestaurantsByPage(int page, int size) {
+        return restaurantPersistencePort.getAllRestaurantsByPage(page, size);
     }
     
     

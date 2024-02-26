@@ -1,10 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.exceptionhandler;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAlreadyExistsException;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.DishAvailableStatusInvalidException;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.RestaurantAlreadyExistsException;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -152,6 +149,13 @@ public class ControllerAdvisor {
             RestaurantAlreadyExistsException ignoredRestaurantAlreadyExistsException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_ALREADY_EXISTS_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(RestaurantsPaginationInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantsPaginationInvalidException(
+            RestaurantsPaginationInvalidException ignoredRestaurantsPaginationInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANTS_PAGINATION_INVALID_EXCEPTION.getMessage()));
     }
     
     @ExceptionHandler(DishAlreadyExistsException.class)
