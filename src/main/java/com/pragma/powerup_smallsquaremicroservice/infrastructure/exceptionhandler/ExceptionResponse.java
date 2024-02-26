@@ -22,8 +22,9 @@ public enum ExceptionResponse {
     OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
     ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
     // INFRASTRUCTURE EXCEPTIONS
+    PAGINATION_INVALID_EXCEPTION("The pagination you entered is invalid"),
+    REQUEST_PARAM_INVALID_EXCEPTION("You entered a invalid request parameter"),
     RESTAURANT_ALREADY_EXISTS_EXCEPTION("A restaurant with that NIT already exists"),
-    RESTAURANTS_PAGINATION_INVALID_EXCEPTION("The pagination you entered is invalid"),
     DISH_ALREADY_EXISTS_EXCEPTION("A dish with that name already exists in the restaurant"),
     DISH_AVAILABLE_STATUS_INVALID_EXCEPTION("The dish status you entered is invalid (not a boolean) should be 'true' " +
                                                     "or 'false'");

@@ -1,8 +1,10 @@
 package com.pragma.powerup_smallsquaremicroservice.application.handler.impl;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.RestaurantRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.RestaurantSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IRestaurantHandler;
+import com.pragma.powerup_smallsquaremicroservice.application.mapper.IDishResponseMapper;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IRestaurantRequestMapper;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IRestaurantResponseMapper;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
@@ -21,6 +23,7 @@ public class RestaurantHandler implements IRestaurantHandler {
     private final IRestaurantServicePort restaurantServicePort;
     private final IRestaurantRequestMapper restaurantRequestMapper;
     private final IRestaurantResponseMapper restaurantResponseMapper;
+    private final IDishResponseMapper dishResponseMapper;
     
     @Override
     public void createRestaurant(RestaurantRequestDto restaurantRequestDto, HttpServletRequest request) {
@@ -36,8 +39,15 @@ public class RestaurantHandler implements IRestaurantHandler {
     }
     
     @Override
-    public Page<RestaurantSimpleResponseDto> getAllRestaurantsByPage(int page, int size) {
-        return restaurantServicePort.getAllRestaurantsByPage(page,size)
+    public Page<RestaurantSimpleResponseDto> getAllRestaurantsPageable(int page, int size) {
+        return restaurantServicePort.getAllRestaurantsPageable(page, size)
                                     .map(restaurantResponseMapper::restaurantToRestaurantSimpleResponseDto);
+    }
+    
+    @Override
+    public Page<DishSimpleResponseDto> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page,
+                                                                          int size) {
+        return restaurantServicePort.getAllDishesFromRestaurantPageable(idRestaurant, idCategory, page, size)
+                                    .map(dishResponseMapper::dishToDishSimpleResponseDto);
     }
 }

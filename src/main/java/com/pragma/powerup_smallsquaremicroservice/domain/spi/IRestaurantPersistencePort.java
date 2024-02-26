@@ -7,5 +7,5 @@ public interface IRestaurantPersistencePort {
     void createRestaurant(Restaurant restaurant);
     Restaurant getRestaurantById(Long idRestaurant);
     boolean validateRestaurantExists(Long idRestaurant);
-    Page<Restaurant> getAllRestaurantsByPage(int page, int size);
+    Page<Restaurant> getAllRestaurantsPageable(int page, int size);
 }

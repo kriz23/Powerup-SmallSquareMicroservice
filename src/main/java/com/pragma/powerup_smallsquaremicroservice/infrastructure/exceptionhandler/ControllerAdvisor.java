@@ -144,18 +144,25 @@ public class ControllerAdvisor {
     }
     
     // INFRASTRUCTURE EXCEPTIONS
+    @ExceptionHandler(PaginationInvalidException.class)
+    public ResponseEntity<Map<String, String>> handlePaginationInvalidException(
+            PaginationInvalidException ignoredPaginationInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.PAGINATION_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(RequestParamInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleRequestParamInvalidException(
+            RequestParamInvalidException ignoredRequestParamInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.REQUEST_PARAM_INVALID_EXCEPTION.getMessage()));
+    }
+    
     @ExceptionHandler(RestaurantAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleRestaurantAlreadyExistsException(
             RestaurantAlreadyExistsException ignoredRestaurantAlreadyExistsException) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_ALREADY_EXISTS_EXCEPTION.getMessage()));
-    }
-    
-    @ExceptionHandler(RestaurantsPaginationInvalidException.class)
-    public ResponseEntity<Map<String, String>> handleRestaurantsPaginationInvalidException(
-            RestaurantsPaginationInvalidException ignoredRestaurantsPaginationInvalidException) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANTS_PAGINATION_INVALID_EXCEPTION.getMessage()));
     }
     
     @ExceptionHandler(DishAlreadyExistsException.class)

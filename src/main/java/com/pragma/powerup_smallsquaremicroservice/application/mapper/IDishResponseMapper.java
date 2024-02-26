@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.application.mapper;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishResponseDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,4 +17,9 @@ public interface IDishResponseMapper {
     @Mapping(source = "category", target = "category")
     @Mapping(source = "restaurant", target = "restaurant")
     DishResponseDto dishToDishResponseDto(Dish dish);
+    
+    @Mapping(source = "category.id", target = "idCategory")
+    @Mapping(source = "restaurant.id", target = "idRestaurant")
+    DishSimpleResponseDto dishToDishSimpleResponseDto(Dish dish);
+    
 }

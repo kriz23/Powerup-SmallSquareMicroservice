@@ -1,10 +1,12 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.input.rest;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.RestaurantRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.DishSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.RestaurantSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IRestaurantEmployeeHandler;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IRestaurantHandler;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.RestaurantsPaginationInvalidException;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.PaginationInvalidException;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.RequestParamInvalidException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -71,12 +73,34 @@ public class RestaurantRestController {
             content = @Content)})
     @GetMapping("/clients/restaurants")
     @PreAuthorize("hasRole('CLIENTE')")
-    public ResponseEntity<Page<RestaurantSimpleResponseDto>> getAllRestaurantsByPage(@RequestParam(defaultValue = "0") int page,
-                                                                                    @RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<Page<RestaurantSimpleResponseDto>> getAllRestaurantsPageable(@RequestParam(defaultValue = "0") int page,
+                                                                                       @RequestParam(defaultValue = "10") int size){
         if (page < 0 || size < 1){
-            throw new RestaurantsPaginationInvalidException();
+            throw new PaginationInvalidException();
         }
-        return ResponseEntity.ok(restaurantHandler.getAllRestaurantsByPage(page, size));
+        return ResponseEntity.ok(restaurantHandler.getAllRestaurantsPageable(page, size));
+    }
+    
+    @Operation(summary = "Get all active dishes from restaurants by page")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Active dishes returned",
+            content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation =
+                    DishSimpleResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not" +
+            " allowed for this operation", content =@Content),
+            @ApiResponse(responseCode = "404", description = "No dishes found",
+                    content = @Content)})
+    @GetMapping("/clients/restaurants/{id}/menu")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Page<DishSimpleResponseDto>> getRestaurantMenu(@Parameter(description = "Restaurant's id") @PathVariable Long id,
+                                                                         @RequestParam(defaultValue = "") Long idCategory,
+                                                                         @RequestParam(defaultValue = "0") int page,
+                                                                         @RequestParam(defaultValue = "10") int size){
+        if (idCategory != null && idCategory <= 0){
+            throw new RequestParamInvalidException();
+        }
+        if (page < 0 || size < 1){
+            throw new PaginationInvalidException();
+        }
+        return ResponseEntity.ok(restaurantHandler.getAllDishesFromRestaurantPageable(id, idCategory, page, size));
     }
 
     

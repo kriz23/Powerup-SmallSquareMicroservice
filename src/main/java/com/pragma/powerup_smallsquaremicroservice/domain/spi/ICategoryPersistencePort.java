@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ICategoryPersistencePort {
     List<Category> getAllCategories();
+    boolean validateCategoryExists(Long idCategory);
 }
