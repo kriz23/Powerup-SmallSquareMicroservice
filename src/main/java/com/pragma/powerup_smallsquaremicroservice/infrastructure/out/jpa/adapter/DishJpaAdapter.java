@@ -12,6 +12,9 @@ import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.reposit
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IDishRepository;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -40,6 +43,23 @@ public class DishJpaAdapter implements IDishPersistencePort {
     @Override
     public void updateDish(Dish dish) {
         dishRepository.save(dishEntityMapper.dishToDishEntity(dish));
+    }
+    
+    @Override
+    public Page<Dish> getActiveDishesFromRestaurantPageable(Long idRestaurant, int page, int size) {
+        Pageable pageableParams = PageRequest.of(page, size);
+        Page<DishEntity> pageableDishes = dishRepository.findByRestaurantEntityIdAndAvailableTrue(idRestaurant,
+                                                                                               pageableParams);
+        return pageableDishes.map(dishEntityMapper::dishEntityToDish);
+    }
+    
+    @Override
+    public Page<Dish> getActiveDishesFromRestaurantPageableByCategory(Long idRestaurant, Long idCategory, int page,
+                                                                      int size) {
+        Pageable pageableParams = PageRequest.of(page, size);
+        Page<DishEntity> pageableDishes = dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndAvailableTrue(
+                idRestaurant, idCategory, pageableParams);
+        return pageableDishes.map(dishEntityMapper::dishEntityToDish);
     }
     
     @Override

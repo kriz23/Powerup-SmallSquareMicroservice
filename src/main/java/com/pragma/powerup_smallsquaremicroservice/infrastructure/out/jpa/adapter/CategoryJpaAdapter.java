@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.exception.CategoryNotFoundException;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Category;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
@@ -22,5 +23,13 @@ public class CategoryJpaAdapter implements ICategoryPersistencePort {
             throw new NoDataFoundException();
         }
         return categoryEntityMapper.categoryEntityListToCategoryList(categoryEntityList);
+    }
+    
+    @Override
+    public boolean validateCategoryExists(Long idCategory) {
+        if(!categoryRepository.existsById(idCategory)){
+            throw new CategoryNotFoundException();
+        }
+        return true;
     }
 }

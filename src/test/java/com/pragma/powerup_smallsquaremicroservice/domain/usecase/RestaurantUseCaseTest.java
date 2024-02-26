@@ -6,6 +6,8 @@ import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Role;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import feign.FeignException;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,12 @@ class RestaurantUseCaseTest {
     
     @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
+    
+    @Mock
+    private ICategoryPersistencePort categoryPersistencePort;
+    
+    @Mock
+    private IDishPersistencePort dishPersistencePort;
     
     @Mock
     private IUserMSClientPort userMSClientPort;
@@ -62,9 +70,27 @@ class RestaurantUseCaseTest {
         int page = 0;
         int size = 10;
         
-        restaurantUseCase.getAllRestaurantsByPage(page, size);
+        restaurantUseCase.getAllRestaurantsPageable(page, size);
         
-        verify(restaurantPersistencePort, times(1)).getAllRestaurantsByPage(page, size);
+        verify(restaurantPersistencePort, times(1)).getAllRestaurantsPageable(page, size);
+    }
+    
+    @Test
+    void getAllDishesFromRestaurantPageable_allValid_withCategory_callsPersistencePort(){
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        when(categoryPersistencePort.validateCategoryExists(1L)).thenReturn(true);
+        
+        restaurantUseCase.getAllDishesFromRestaurantPageable(1L, 1L, 0, 10);
+        verify(dishPersistencePort, times(1)).getActiveDishesFromRestaurantPageableByCategory(1L, 1L, 0, 10);
+        
+    }
+    
+    @Test
+    void getAllDishesFromRestaurantPageable_allValid_withoutCategory_callsPersistencePort(){
+        when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
+        
+        restaurantUseCase.getAllDishesFromRestaurantPageable(1L, null, 0, 10);
+        verify(dishPersistencePort, times(1)).getActiveDishesFromRestaurantPageable(1L, 0, 10);
     }
     
     @Test

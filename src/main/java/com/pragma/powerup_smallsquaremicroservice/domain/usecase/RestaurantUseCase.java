@@ -4,8 +4,11 @@ import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
+import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
 import feign.FeignException;
 import org.springframework.data.domain.Page;
@@ -16,13 +19,17 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     private static final Long ADMIN_ROLE_ID = 1L;
     private static final Long OWNER_ROLE_ID = 2L;
     private final IRestaurantPersistencePort restaurantPersistencePort;
+    private final ICategoryPersistencePort categoryPersistencePort;
+    private final IDishPersistencePort dishPersistencePort;
     private final IUserMSClientPort userMSClientPort;
     private final IJwtServicePort jwtServicePort;
     
     public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort,
-                             IUserMSClientPort userMSClientPort,
-                             IJwtServicePort jwtServicePort) {
+                             ICategoryPersistencePort categoryPersistencePort, IDishPersistencePort dishPersistencePort,
+                             IUserMSClientPort userMSClientPort, IJwtServicePort jwtServicePort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
+        this.categoryPersistencePort = categoryPersistencePort;
+        this.dishPersistencePort = dishPersistencePort;
         this.userMSClientPort = userMSClientPort;
         this.jwtServicePort = jwtServicePort;
     }
@@ -39,8 +46,25 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
     
     @Override
-    public Page<Restaurant> getAllRestaurantsByPage(int page, int size) {
-        return restaurantPersistencePort.getAllRestaurantsByPage(page, size);
+    public Page<Restaurant> getAllRestaurantsPageable(int page, int size) {
+        return restaurantPersistencePort.getAllRestaurantsPageable(page, size);
+    }
+    
+    @Override
+    public Page<Dish> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page, int size) {
+        Page<Dish> activeDishes = null;
+        if (restaurantPersistencePort.validateRestaurantExists(idRestaurant)) {
+            if (idCategory != null && idCategory > 0) {
+                if (categoryPersistencePort.validateCategoryExists(idCategory)) {
+                    activeDishes = dishPersistencePort.getActiveDishesFromRestaurantPageableByCategory(idRestaurant,
+                                                                                                       idCategory, page,
+                                                                                                       size);
+                }
+            } else {
+                activeDishes = dishPersistencePort.getActiveDishesFromRestaurantPageable(idRestaurant, page, size);
+            }
+        }
+        return activeDishes;
     }
     
     
@@ -99,10 +123,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public boolean validateOwnerRoleFromRequest(String authHeader, Long idOwner) {
         if (validateIdOwner(idOwner)) {
             try {
-                if (!OWNER_ROLE_ID.equals(userMSClientPort.getOwnerById(authHeader, idOwner).getRole().getId())){
+                if (!OWNER_ROLE_ID.equals(userMSClientPort.getOwnerById(authHeader, idOwner).getRole().getId())) {
                     throw new RoleNotAllowedException();
                 }
-            } catch (FeignException.FeignClientException e){
+            } catch (FeignException.FeignClientException e) {
                 throw new OwnerNotFoundException();
             }
         }
@@ -120,7 +144,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     
     @Override
     public boolean validateRestaurantOwnership(String authHeader, Long idRestaurant) {
-        if (restaurantPersistencePort.validateRestaurantExists(idRestaurant)){
+        if (restaurantPersistencePort.validateRestaurantExists(idRestaurant)) {
             String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
             User requestUser = userMSClientPort.getUserByMail(authHeader, requestUserMail);
             Restaurant currentRestaurant = restaurantPersistencePort.getRestaurantById(idRestaurant);
@@ -131,7 +155,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     
     @Override
     public boolean validateRestaurantOwnershipInternal(String authHeader, Long idRestaurant) {
-        if (validateRestaurantOwnership(authHeader, idRestaurant)){
+        if (validateRestaurantOwnership(authHeader, idRestaurant)) {
             return true;
         } else {
             throw new RestaurantOwnershipInvalidException();
