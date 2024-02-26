@@ -1,9 +1,11 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.api;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
+import org.springframework.data.domain.Page;
 
 public interface IRestaurantServicePort {
     void createRestaurant(String authHeader, Restaurant restaurant);
+    Page<Restaurant> getAllRestaurantsByPage(int page, int size);
     
     boolean validateName(String name);
     boolean validateNIT(String nit);

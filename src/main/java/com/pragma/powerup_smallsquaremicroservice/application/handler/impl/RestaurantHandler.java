@@ -1,11 +1,13 @@
 package com.pragma.powerup_smallsquaremicroservice.application.handler.impl;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.RestaurantRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.RestaurantSimpleResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IRestaurantHandler;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IRestaurantRequestMapper;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IRestaurantResponseMapper;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +33,11 @@ public class RestaurantHandler implements IRestaurantHandler {
     public boolean validateRestaurantOwnership(Long idRestaurant, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         return restaurantServicePort.validateRestaurantOwnership(authHeader, idRestaurant);
+    }
+    
+    @Override
+    public Page<RestaurantSimpleResponseDto> getAllRestaurantsByPage(int page, int size) {
+        return restaurantServicePort.getAllRestaurantsByPage(page,size)
+                                    .map(restaurantResponseMapper::restaurantToRestaurantSimpleResponseDto);
     }
 }

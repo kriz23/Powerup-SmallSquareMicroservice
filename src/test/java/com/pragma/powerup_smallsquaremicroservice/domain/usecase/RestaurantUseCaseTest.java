@@ -58,6 +58,16 @@ class RestaurantUseCaseTest {
     }
     
     @Test
+    void getAllRestaurantsByPage_allValid_callsPersistencePort(){
+        int page = 0;
+        int size = 10;
+        
+        restaurantUseCase.getAllRestaurantsByPage(page, size);
+        
+        verify(restaurantPersistencePort, times(1)).getAllRestaurantsByPage(page, size);
+    }
+    
+    @Test
     void validateName_validName_returnsTrue(){
         String name = "Restaurant";
         

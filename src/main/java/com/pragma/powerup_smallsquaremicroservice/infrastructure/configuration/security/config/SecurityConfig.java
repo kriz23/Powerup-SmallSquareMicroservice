@@ -30,8 +30,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> req
                     .antMatchers(WHITE_LIST_URL).permitAll()
                     .antMatchers("/api/v1/smallsquare/categories").hasRole("ADMIN")
-                    .antMatchers("/api/v1/smallsquare/restaurants").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO", "CLIENTE")
-                    .antMatchers("/api/v1/smallsquare/dishes").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO", "CLIENTE")
+                    .antMatchers("/api/v1/smallsquare/restaurants").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO")
+                    .antMatchers("/api/v1/smallsquare/dishes").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO")
+                    .antMatchers("/api/v1/smallsquare/clients").hasAnyRole("CLIENTE")
                     .anyRequest().authenticated())
             .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
