@@ -18,6 +18,11 @@ public enum ExceptionResponse {
     DISH_NOT_FOUND_EXCEPTION("The dish you are looking for does not exist"),
     DISH_PRICE_INVALID_EXCEPTION("The price you entered is invalid or empty"),
     DISH_URL_IMAGE_INVALID_EXCEPTION("The dish image URL you entered is invalid or empty"),
+    // -- ORDER EXCEPTIONS (DOMAIN) --
+    CLIENT_RESTAURANT_EQUALS_PHONE_EXCEPTION("The client cannot order from a restaurant with the same phone"),
+    CLIENT_HAS_UNFINISHED_ORDER_EXCEPTION("The client has an unfinished order in this restaurant"),
+    CLIENT_ORDER_INVALID_EXCEPTION("The list of dishes you entered is invalid"),
+    DISH_IN_ORDER_INVALID_EXCEPTION("At least one of the dishes you entered is invalid (unavailable or not found)"),
     // --FEIGN EXCEPTIONS--
     OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
     ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),
