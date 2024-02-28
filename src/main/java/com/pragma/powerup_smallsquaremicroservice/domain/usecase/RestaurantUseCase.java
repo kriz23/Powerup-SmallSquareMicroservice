@@ -10,14 +10,15 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.User;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.utils.Constants;
 import feign.FeignException;
 import org.springframework.data.domain.Page;
 
 import java.util.regex.Pattern;
 
 public class RestaurantUseCase implements IRestaurantServicePort {
-    private static final Long ADMIN_ROLE_ID = 1L;
-    private static final Long OWNER_ROLE_ID = 2L;
+    private static final Long ADMIN_ROLE_ID = Constants.ADMIN_ROLE_ID;
+    private static final Long OWNER_ROLE_ID = Constants.OWNER_ROLE_ID;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final ICategoryPersistencePort categoryPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
@@ -96,7 +97,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     
     @Override
     public boolean validatePhone(String phone) {
-        Pattern pattern = Pattern.compile("^\\+?\\d{9,13}$");
+        Pattern pattern = Pattern.compile("^\\+573\\d{9}$");
         if (!pattern.matcher(phone).matches() || phone.isEmpty()) {
             throw new RestaurantPhoneInvalidException();
         }

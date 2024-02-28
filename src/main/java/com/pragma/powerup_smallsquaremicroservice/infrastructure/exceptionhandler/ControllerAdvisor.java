@@ -128,6 +128,35 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_URL_IMAGE_INVALID_EXCEPTION.getMessage()));
     }
     
+    // -- ORDER EXCEPTIONS (DOMAIN) --
+    @ExceptionHandler(ClientRestaurantEqualsPhoneException.class)
+    public ResponseEntity<Map<String, String>> handleClientRestaurantEqualsPhoneException(
+            ClientRestaurantEqualsPhoneException ignoredClientRestaurantEqualsPhoneException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.CLIENT_RESTAURANT_EQUALS_PHONE_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(ClientHasUnfinishedOrderException.class)
+    public ResponseEntity<Map<String, String>> handleClientHasUnfinishedOrderException(
+            ClientHasUnfinishedOrderException ignoredClientHasUnfinishedOrderException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.CLIENT_HAS_UNFINISHED_ORDER_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(ClientOrderInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleClientOrderInvalidException(
+            ClientOrderInvalidException ignoredClientOrderInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.CLIENT_ORDER_INVALID_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(DishInOrderInvalidException.class)
+    public ResponseEntity<Map<String, String>> handleDishInOrderInvalidException(
+            DishInOrderInvalidException ignoredDishInOrderInvalidException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_IN_ORDER_INVALID_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(

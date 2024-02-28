@@ -63,6 +63,13 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
+    public List<Dish> getActiveDishesFromRestaurantByDishesIds(Long idRestaurant, List<Long> idsDishes) {
+        List<DishEntity> dishEntityList = dishRepository.findAllByIdInAndRestaurantEntityIdAndAvailableTrue(idsDishes,
+                                                                                                            idRestaurant);
+        return dishEntityMapper.dishEntityListToDishList(dishEntityList);
+    }
+    
+    @Override
     public boolean validateName(Dish dish) {
         if (dish.getName().isEmpty()) {
             throw new GenericNameInvalidException();

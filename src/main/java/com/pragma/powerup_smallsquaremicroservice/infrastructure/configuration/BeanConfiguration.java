@@ -2,29 +2,15 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.configuration;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.ICategoryPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantEmployeePersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.usecase.CategoryUseCase;
-import com.pragma.powerup_smallsquaremicroservice.domain.usecase.DishUseCase;
-import com.pragma.powerup_smallsquaremicroservice.domain.usecase.RestaurantEmployeeUseCase;
-import com.pragma.powerup_smallsquaremicroservice.domain.usecase.RestaurantUseCase;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.*;
+import com.pragma.powerup_smallsquaremicroservice.domain.usecase.*;
+import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderUtils;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.adapter.UserFeignClientAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.feignclient.IUserFeignClient;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.mapper.IUserMSClientResponseMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.CategoryJpaAdapter;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.DishJpaAdapter;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.RestaurantEmployeeJpaAdapter;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.RestaurantJpaAdapter;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.ICategoryEntityMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IDishEntityMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IRestaurantEntityMapper;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.ICategoryRepository;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IDishRepository;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantEmployeeRepository;
-import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantRepository;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.*;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.*;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +29,10 @@ public class BeanConfiguration {
     private final IDishEntityMapper dishEntityMapper;
     private final IRestaurantEmployeeRepository restaurantEmployeeRepository;
     private final IRestaurantEmployeeEntityMapper restaurantEmployeeEntityMapper;
+    private final IOrderDishRepository orderDishRepository;
+    private final IOrderDishEntityMapper orderDishEntityMapper;
+    private final IOrderRepository orderRepository;
+    private final IOrderEntityMapper orderEntityMapper;
     
     @Bean
     public IUserMSClientPort userMSClientPort() {
@@ -88,5 +78,26 @@ public class BeanConfiguration {
     @Bean
     public IRestaurantEmployeeServicePort restaurantEmployeeServicePort() {
         return new RestaurantEmployeeUseCase(restaurantEmployeePersistencePort(), restaurantServicePort());
+    }
+    
+    @Bean
+    public IOrderDishPersistencePort orderDishPersistencePort(){
+        return new OrderDishJpaAdapter(orderDishRepository, orderDishEntityMapper);
+    }
+    
+    @Bean
+    public IOrderPersistencePort orderPersistencePort(){
+        return new OrderJpaAdapter(orderRepository, orderEntityMapper);
+    }
+    
+    @Bean
+    public OrderUtils orderUtils(){
+        return new OrderUtils(orderPersistencePort(), dishPersistencePort());
+    }
+    
+    @Bean
+    public IOrderServicePort orderServicePort(){
+        return new OrderUseCase(orderPersistencePort(), orderDishPersistencePort(), restaurantPersistencePort(),
+                                dishPersistencePort(), userMSClientPort(), jwtServicePort, orderUtils());
     }
 }

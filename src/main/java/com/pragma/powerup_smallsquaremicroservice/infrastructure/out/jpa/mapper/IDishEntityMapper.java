@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, unmappedSourcePolicy =
         ReportingPolicy.IGNORE)
 public interface IDishEntityMapper {
@@ -16,4 +18,6 @@ public interface IDishEntityMapper {
     @Mapping(source = "categoryEntity.id", target = "category.id")
     @Mapping(source = "restaurantEntity.id", target = "restaurant.id")
     Dish dishEntityToDish(DishEntity dishEntity);
+    
+    List<Dish> dishEntityListToDishList(List<DishEntity> dishEntityList);
 }
