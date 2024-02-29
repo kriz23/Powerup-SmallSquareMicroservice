@@ -11,5 +11,5 @@ public interface IRestaurantHandler {
     void createRestaurant(RestaurantRequestDto restaurantRequestDto, HttpServletRequest request);
     boolean validateRestaurantOwnership(Long idRestaurant, HttpServletRequest request);
     Page<RestaurantSimpleResponseDto> getAllRestaurantsPageable(int page, int size);
-    Page<DishSimpleResponseDto> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page, int size);
+    Page<DishSimpleResponseDto> getAllDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page, int size);
 }

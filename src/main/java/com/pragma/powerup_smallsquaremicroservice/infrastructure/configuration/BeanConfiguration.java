@@ -77,7 +77,8 @@ public class BeanConfiguration {
     
     @Bean
     public IRestaurantEmployeeServicePort restaurantEmployeeServicePort() {
-        return new RestaurantEmployeeUseCase(restaurantEmployeePersistencePort(), restaurantServicePort());
+        return new RestaurantEmployeeUseCase(restaurantEmployeePersistencePort(), restaurantServicePort(),
+                                             userMSClientPort(), jwtServicePort);
     }
     
     @Bean
@@ -98,6 +99,7 @@ public class BeanConfiguration {
     @Bean
     public IOrderServicePort orderServicePort(){
         return new OrderUseCase(orderPersistencePort(), orderDishPersistencePort(), restaurantPersistencePort(),
-                                dishPersistencePort(), userMSClientPort(), jwtServicePort, orderUtils());
+                                dishPersistencePort(), restaurantEmployeeServicePort(), userMSClientPort(),
+                                jwtServicePort, orderUtils());
     }
 }

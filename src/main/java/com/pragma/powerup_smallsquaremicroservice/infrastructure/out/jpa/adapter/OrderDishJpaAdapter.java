@@ -17,4 +17,9 @@ public class OrderDishJpaAdapter implements IOrderDishPersistencePort {
     public void createOrderDishesFromOrder(List<OrderDish> orderDishes) {
         orderDishRepository.saveAll(orderDishEntityMapper.orderDishListToOrderDishEntityList(orderDishes));
     }
+    
+    @Override
+    public List<OrderDish> getOrderDishesByOrderId(Long idOrder) {
+        return orderDishEntityMapper.orderDishEntityListToOrderDishList(orderDishRepository.findAllByOrderEntityId(idOrder));
+    }
 }

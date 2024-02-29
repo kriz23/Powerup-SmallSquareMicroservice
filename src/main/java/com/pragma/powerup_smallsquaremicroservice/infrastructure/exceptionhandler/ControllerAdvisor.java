@@ -157,6 +157,20 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.DISH_IN_ORDER_INVALID_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleEmployeeNotFoundException(
+            EmployeeNotFoundException ignoredEmployeeNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.EMPLOYEE_NOT_FOUND_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(StateFilterEmptyException.class)
+    public ResponseEntity<Map<String, String>> handleStateFilterEmptyException(
+            StateFilterEmptyException ignoredStateFilterEmptyException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.STATE_FILTER_EMPTY_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(

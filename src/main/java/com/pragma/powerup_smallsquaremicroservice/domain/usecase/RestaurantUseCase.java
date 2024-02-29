@@ -52,12 +52,12 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     }
     
     @Override
-    public Page<Dish> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page, int size) {
+    public Page<Dish> getAllDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page, int size) {
         Page<Dish> activeDishes = null;
         if (restaurantPersistencePort.validateRestaurantExists(idRestaurant)) {
             if (idCategory != null && idCategory > 0) {
                 if (categoryPersistencePort.validateCategoryExists(idCategory)) {
-                    activeDishes = dishPersistencePort.getActiveDishesFromRestaurantPageableByCategory(idRestaurant,
+                    activeDishes = dishPersistencePort.getActiveDishesFromRestaurantByCategoryPageable(idRestaurant,
                                                                                                        idCategory, page,
                                                                                                        size);
                 }

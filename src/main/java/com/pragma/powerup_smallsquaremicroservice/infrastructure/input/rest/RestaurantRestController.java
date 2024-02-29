@@ -81,13 +81,11 @@ public class RestaurantRestController {
         return ResponseEntity.ok(restaurantHandler.getAllRestaurantsPageable(page, size));
     }
     
-    @Operation(summary = "Get all active dishes from restaurants by page")
+    @Operation(summary = "Get all active dishes from restaurants by category pageable")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Active dishes returned",
-            content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation =
-                    DishSimpleResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not" +
-            " allowed for this operation", content =@Content),
-            @ApiResponse(responseCode = "404", description = "No dishes found",
-                    content = @Content)})
+        content = @Content(mediaType = "application/json",array = @ArraySchema(schema = @Schema(implementation =
+        DishSimpleResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not allowed for this operation",
+        content =@Content),@ApiResponse(responseCode = "404", description = "No dishes found",content = @Content)})
     @GetMapping("/clients/restaurants/{id}/menu")
     @PreAuthorize("hasRole('CLIENTE')")
     public ResponseEntity<Page<DishSimpleResponseDto>> getRestaurantMenu(@Parameter(description = "Restaurant's id") @PathVariable Long id,
@@ -100,7 +98,7 @@ public class RestaurantRestController {
         if (page < 0 || size < 1){
             throw new PaginationInvalidException();
         }
-        return ResponseEntity.ok(restaurantHandler.getAllDishesFromRestaurantPageable(id, idCategory, page, size));
+        return ResponseEntity.ok(restaurantHandler.getAllDishesFromRestaurantByCategoryPageable(id, idCategory, page, size));
     }
 
     

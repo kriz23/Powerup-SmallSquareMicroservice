@@ -52,9 +52,9 @@ public class RestaurantHandler implements IRestaurantHandler {
     }
     
     @Override
-    public Page<DishSimpleResponseDto> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page,
-                                                                          int size) {
-        return restaurantServicePort.getAllDishesFromRestaurantPageable(idRestaurant, idCategory, page, size)
+    public Page<DishSimpleResponseDto> getAllDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page,
+                                                                                    int size) {
+        return restaurantServicePort.getAllDishesFromRestaurantByCategoryPageable(idRestaurant, idCategory, page, size)
                                     .map(dishResponseMapper::dishToDishSimpleResponseDto);
     }
 }
