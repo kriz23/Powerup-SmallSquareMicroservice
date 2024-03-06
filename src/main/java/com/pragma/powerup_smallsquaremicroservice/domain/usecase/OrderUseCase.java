@@ -113,4 +113,22 @@ public class OrderUseCase implements IOrderServicePort {
         }
         return orders;
     }
+    
+    @Override
+    public void assignEmployeeToOrder(String authHeader, Long idOrder) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestUser = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestUser.getId())){
+            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestUser.getId());
+            Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+            if (!existingOrder.getRestaurant().getId().equals(idRestaurant)){
+                throw new EmployeeInvalidOperationException();
+            }
+            if (existingOrder.getIdChef() == null && existingOrder.getState() == OrderStateEnum.PENDING){
+                existingOrder.setIdChef(requestUser.getId());
+                existingOrder.setState(existingOrder.getState().nextState());
+                orderPersistencePort.updateOrder(existingOrder);
+            }
+        }
+    }
 }

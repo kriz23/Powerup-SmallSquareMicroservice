@@ -35,4 +35,10 @@ public class OrderHandler implements IOrderHandler {
         return orderServicePort.getOrdersFromRestaurantByStatePageable(authHeader, state, page, size)
                                .map(orderResponseMapper::orderToOrderResponseDto);
     }
+    
+    @Override
+    public void assignEmployeeToOrder(Long idOrder, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        orderServicePort.assignEmployeeToOrder(authHeader, idOrder);
+    }
 }

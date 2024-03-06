@@ -25,6 +25,7 @@ public enum ExceptionResponse {
     DISH_IN_ORDER_INVALID_EXCEPTION("At least one of the dishes you entered is invalid (unavailable or not found)"),
     EMPLOYEE_NOT_FOUND_EXCEPTION("The employee does not belong to any restaurant"),
     STATE_FILTER_EMPTY_EXCEPTION("The state filter you entered is empty"),
+    EMPLOYEE_INVALID_OPERATION_EXCEPTION("The employee cannot perform this operation"),
     // --FEIGN EXCEPTIONS--
     OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
     ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),

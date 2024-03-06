@@ -7,4 +7,5 @@ import org.springframework.data.domain.Page;
 public interface IOrderServicePort {
     void createOrder(String authHeader, Order order);
     Page<Order> getOrdersFromRestaurantByStatePageable(String authHeader, OrderStateEnum state, int page, int size);
+    void assignEmployeeToOrder(String authHeader, Long idOrder);
 }

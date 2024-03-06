@@ -3,6 +3,7 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapte
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Order;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderPersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.exception.NoDataFoundException;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.entity.OrderEntity;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IOrderEntityMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IOrderRepository;
@@ -37,5 +38,16 @@ public class OrderJpaAdapter implements IOrderPersistencePort {
         Pageable pageableParams = PageRequest.of(page, size);
         Page<OrderEntity> pageableOrders = orderRepository.findByRestaurantEntityIdAndState(idRestaurant, state, pageableParams);
         return pageableOrders.map(orderEntityMapper::orderEntityToOrder);
+    }
+    
+    @Override
+    public Order getOrderById(Long idOrder) {
+        OrderEntity orderEntity = orderRepository.findById(idOrder).orElseThrow(NoDataFoundException::new);
+        return orderEntityMapper.orderEntityToOrder(orderEntity);
+    }
+    
+    @Override
+    public void updateOrder(Order order) {
+        orderRepository.save(orderEntityMapper.orderToOrderEntity(order));
     }
 }
