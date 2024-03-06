@@ -8,4 +8,6 @@ public interface IOrderPersistencePort {
     Order createOrder(Order order);
     boolean clientHasUnfinishedOrders(Long idClient);
     Page<Order> getOrdersFromRestaurantByStatePageable(Long idRestaurant, OrderStateEnum state, int page, int size);
+    Order getOrderById(Long idOrder);
+    void updateOrder(Order order);
 }

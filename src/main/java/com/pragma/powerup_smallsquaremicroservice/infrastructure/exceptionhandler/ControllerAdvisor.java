@@ -171,6 +171,13 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.STATE_FILTER_EMPTY_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(EmployeeInvalidOperationException.class)
+    public ResponseEntity<Map<String, String>> handleEmployeeInvalidOperationException(
+            EmployeeInvalidOperationException ignoredEmployeeInvalidOperationException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.EMPLOYEE_INVALID_OPERATION_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(

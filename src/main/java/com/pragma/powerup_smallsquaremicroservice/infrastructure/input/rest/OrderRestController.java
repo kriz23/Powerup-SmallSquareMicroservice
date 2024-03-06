@@ -62,4 +62,16 @@ public class OrderRestController {
         }
         return ResponseEntity.ok(orderHandler.getOrdersFromRestaurantByStatePageable(state, page, size, request));
     }
+    
+    @Operation(summary = "Assign employee to order")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "403", description = "User not allowed for this operation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/employees/orders/assign/{id}")
+    @PreAuthorize("hasRole('EMPLEADO')")
+    public ResponseEntity<Void> assignEmployeeToOrder(@Parameter(description = "Order id") @PathVariable Long id,
+                                                     HttpServletRequest request){
+        orderHandler.assignEmployeeToOrder(id, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
