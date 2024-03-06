@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IOrderDishPersistencePort {
     void createOrderDishesFromOrder(List<OrderDish> orderDishes);
+    List<OrderDish> getOrderDishesByOrderId(Long idOrder);
 }

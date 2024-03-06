@@ -4,4 +4,6 @@ import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.entity.
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IRestaurantEmployeeRepository extends JpaRepository<RestaurantEmployeeEntity, Long> {
+    boolean existsByIdEmployee(Long idEmployee);
+    RestaurantEmployeeEntity findByIdEmployee(Long idEmployee);
 }

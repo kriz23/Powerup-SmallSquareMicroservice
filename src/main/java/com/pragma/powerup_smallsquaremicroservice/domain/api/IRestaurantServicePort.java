@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 public interface IRestaurantServicePort {
     void createRestaurant(String authHeader, Restaurant restaurant);
     Page<Restaurant> getAllRestaurantsPageable(int page, int size);
-    Page<Dish> getAllDishesFromRestaurantPageable(Long idRestaurant, Long idCategory, int page, int size);
+    Page<Dish> getAllDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page, int size);
     
     boolean validateName(String name);
     boolean validateNIT(String nit);

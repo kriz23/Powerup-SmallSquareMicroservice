@@ -1,5 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.spi;
 
 public interface IRestaurantEmployeePersistencePort {
-    void assingEmployeeToRestaurant(Long idRestaurant, Long idEmployee);
+    void assignEmployeeToRestaurant(Long idRestaurant, Long idEmployee);
+    boolean validateEmployeeExists(Long idEmployee);
+    Long getRestaurantId(Long idEmployee);
 }

@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +39,9 @@ public class OrderUseCaseTest {
     
     @Mock
     private IDishPersistencePort dishPersistencePort;
+    
+    @Mock
+    private IRestaurantEmployeeServicePort restaurantEmployeeServicePort;
     
     @Mock
     private IUserMSClientPort userMSClientPort;
@@ -230,4 +236,56 @@ public class OrderUseCaseTest {
         
         assertThrows(ClientOrderInvalidException.class, () -> orderUseCase.createOrder(authHeader, order));
     }
+    
+    @Test
+    void getOrdersFromRestaurantByStatePageable_allValid_withState_callsPersistencePort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(3L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"employee@mail.com", "password",
+                                     new Role(3L, "ROLE_EMPLEADO", "Empleado")));
+        when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
+        when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
+        List<Order> orderList = List.of(
+                new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
+                          new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321",
+                                         "www.logo.com", 2L),
+                          List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish", new Category(1L,"Categoría","Descripción"),
+                                                                              "Descripción", 10000,
+                                                                              new Restaurant(1L, "Restaurant",
+                                                                                             "123456789", "Calle 123",
+                                                                                             "+573107654321","www.logo.com",2L),
+                                                                                              "www.image.com", true),
+                                        2)), 20000, "1234"));
+        Page<Order> orders = new PageImpl<>(orderList);
+        when(orderPersistencePort.getOrdersFromRestaurantByStatePageable(1L, OrderStateEnum.PENDING, 0, 10))
+                .thenReturn(orders);
+        
+        orderUseCase.getOrdersFromRestaurantByStatePageable(authHeader, OrderStateEnum.PENDING, 0, 10);
+        verify(orderPersistencePort, times(1)).getOrdersFromRestaurantByStatePageable(1L, OrderStateEnum.PENDING, 0, 10);
+        verify(orderDishPersistencePort, times(1)).getOrderDishesByOrderId(1L);
+    }
+    
+    @Test
+    void getOrdersFromRestaurantByStatePageable_allValid_withoutState_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(3L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"employee@mail.com", "password",
+                                     new Role(3L, "ROLE_EMPLEADO", "Empleado")));
+        when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
+        when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
+        
+        assertThrows(StateFilterEmptyException.class, () -> orderUseCase.getOrdersFromRestaurantByStatePageable(authHeader, null, 0, 10));
+    }
+    
+    
 }

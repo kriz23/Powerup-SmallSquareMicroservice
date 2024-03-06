@@ -17,6 +17,6 @@ public class RestaurantEmployeeHandler implements IRestaurantEmployeeHandler {
     @Override
     public boolean assignEmployeeToRestaurant(Long idRestaurant, Long idEmployee, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        return restaurantEmployeeServicePort.assingEmployeeToRestaurant(authHeader, idRestaurant, idEmployee);
+        return restaurantEmployeeServicePort.assignEmployeeToRestaurant(authHeader, idRestaurant, idEmployee);
     }
 }

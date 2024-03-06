@@ -33,6 +33,7 @@ public class SecurityConfig {
                     .antMatchers("/api/v1/smallsquare/restaurants").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO")
                     .antMatchers("/api/v1/smallsquare/dishes").hasAnyRole("ADMIN", "PROPIETARIO", "EMPLEADO")
                     .antMatchers("/api/v1/smallsquare/clients").hasAnyRole("CLIENTE")
+                    .antMatchers("/api/v1/smallsquare/employees").hasAnyRole("EMPLEADO")
                     .anyRequest().authenticated())
             .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

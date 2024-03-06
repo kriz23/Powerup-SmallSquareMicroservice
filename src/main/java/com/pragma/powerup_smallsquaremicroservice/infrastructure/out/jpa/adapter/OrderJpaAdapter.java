@@ -7,6 +7,9 @@ import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.entity.
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IOrderEntityMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IOrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -26,5 +29,13 @@ public class OrderJpaAdapter implements IOrderPersistencePort {
                 OrderStateEnum.DELIVERED, OrderStateEnum.CANCELLED));
         
         return !unfinishedOrders.isEmpty();
+    }
+    
+    @Override
+    public Page<Order> getOrdersFromRestaurantByStatePageable(Long idRestaurant, OrderStateEnum state, int page,
+                                                              int size) {
+        Pageable pageableParams = PageRequest.of(page, size);
+        Page<OrderEntity> pageableOrders = orderRepository.findByRestaurantEntityIdAndState(idRestaurant, state, pageableParams);
+        return pageableOrders.map(orderEntityMapper::orderEntityToOrder);
     }
 }

@@ -54,7 +54,7 @@ public class DishJpaAdapter implements IDishPersistencePort {
     }
     
     @Override
-    public Page<Dish> getActiveDishesFromRestaurantPageableByCategory(Long idRestaurant, Long idCategory, int page,
+    public Page<Dish> getActiveDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page,
                                                                       int size) {
         Pageable pageableParams = PageRequest.of(page, size);
         Page<DishEntity> pageableDishes = dishRepository.findByRestaurantEntityIdAndCategoryEntityIdAndAvailableTrue(

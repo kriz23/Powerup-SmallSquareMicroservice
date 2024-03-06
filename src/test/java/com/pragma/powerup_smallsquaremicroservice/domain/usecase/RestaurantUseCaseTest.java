@@ -80,8 +80,8 @@ class RestaurantUseCaseTest {
         when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
         when(categoryPersistencePort.validateCategoryExists(1L)).thenReturn(true);
         
-        restaurantUseCase.getAllDishesFromRestaurantPageable(1L, 1L, 0, 10);
-        verify(dishPersistencePort, times(1)).getActiveDishesFromRestaurantPageableByCategory(1L, 1L, 0, 10);
+        restaurantUseCase.getAllDishesFromRestaurantByCategoryPageable(1L, 1L, 0, 10);
+        verify(dishPersistencePort, times(1)).getActiveDishesFromRestaurantByCategoryPageable(1L, 1L, 0, 10);
         
     }
     
@@ -89,7 +89,7 @@ class RestaurantUseCaseTest {
     void getAllDishesFromRestaurantPageable_allValid_withoutCategory_callsPersistencePort(){
         when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
         
-        restaurantUseCase.getAllDishesFromRestaurantPageable(1L, null, 0, 10);
+        restaurantUseCase.getAllDishesFromRestaurantByCategoryPageable(1L, null, 0, 10);
         verify(dishPersistencePort, times(1)).getActiveDishesFromRestaurantPageable(1L, 0, 10);
     }
     
