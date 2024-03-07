@@ -8,6 +8,7 @@ import java.util.List;
 public class Order {
     private Long id;
     private Long idClient;
+    private String clientPhone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private OrderStateEnum state;
@@ -20,10 +21,12 @@ public class Order {
     public Order() {
     }
     
-    public Order(Long id, Long idClient, LocalDateTime createdAt, LocalDateTime updatedAt, OrderStateEnum state,
-                 Long idChef, Restaurant restaurant, List<OrderDish> orderDishes, double amount, String pin) {
+    public Order(Long id, Long idClient, String clientPhone, LocalDateTime createdAt, LocalDateTime updatedAt,
+                 OrderStateEnum state, Long idChef, Restaurant restaurant, List<OrderDish> orderDishes, double amount,
+                 String pin) {
         this.id = id;
         this.idClient = idClient;
+        this.clientPhone = clientPhone;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.state = state;
@@ -48,6 +51,14 @@ public class Order {
     
     public void setIdClient(Long idClient) {
         this.idClient = idClient;
+    }
+    
+    public String getClientPhone() {
+        return clientPhone;
+    }
+    
+    public void setClientPhone(String clientPhone) {
+        this.clientPhone = clientPhone;
     }
     
     public LocalDateTime getCreatedAt() {

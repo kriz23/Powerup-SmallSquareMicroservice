@@ -178,6 +178,13 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.EMPLOYEE_INVALID_OPERATION_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(MessageNotSentException.class)
+    public ResponseEntity<Map<String, String>> handleMessageNotSentException(
+            MessageNotSentException ignoredMessageNotSentException) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.MESSAGE_NOT_SENT_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(

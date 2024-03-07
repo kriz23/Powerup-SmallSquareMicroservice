@@ -12,4 +12,5 @@ public interface IOrderHandler {
     Page<OrderResponseDto> getOrdersFromRestaurantByStatePageable(OrderStateEnum state, int page, int size,
                                                                   HttpServletRequest request);
     void assignEmployeeToOrder(Long idOrder, HttpServletRequest request);
+    void setOrderReady(Long idOrder, HttpServletRequest request);
 }
