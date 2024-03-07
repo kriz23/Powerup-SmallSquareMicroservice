@@ -26,6 +26,7 @@ public enum ExceptionResponse {
     EMPLOYEE_NOT_FOUND_EXCEPTION("The employee does not belong to any restaurant"),
     STATE_FILTER_EMPTY_EXCEPTION("The state filter you entered is empty"),
     EMPLOYEE_INVALID_OPERATION_EXCEPTION("The employee cannot perform this operation"),
+    MESSAGE_NOT_SENT_EXCEPTION("The message to the client could not be sent"),
     // --FEIGN EXCEPTIONS--
     OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
     ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),

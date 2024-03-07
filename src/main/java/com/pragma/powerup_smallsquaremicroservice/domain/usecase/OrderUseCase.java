@@ -3,6 +3,7 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
@@ -29,11 +30,12 @@ public class OrderUseCase implements IOrderServicePort {
     private final IUserMSClientPort userMSClientPort;
     private final IJwtServicePort jwtServicePort;
     private final OrderUtils orderUtils;
+    private final IMessengerMSClientPort messengerMSClientPort;
     
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderDishPersistencePort orderDishPersistencePort,
                         IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort,
                         IRestaurantEmployeeServicePort restaurantEmployeeServicePort, IUserMSClientPort userMSClientPort,
-                        IJwtServicePort jwtServicePort, OrderUtils orderUtils) {
+                        IJwtServicePort jwtServicePort, OrderUtils orderUtils, IMessengerMSClientPort messengerMSClientPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
@@ -42,6 +44,7 @@ public class OrderUseCase implements IOrderServicePort {
         this.userMSClientPort = userMSClientPort;
         this.jwtServicePort = jwtServicePort;
         this.orderUtils = orderUtils;
+        this.messengerMSClientPort = messengerMSClientPort;
     }
     
     @Override
@@ -83,6 +86,7 @@ public class OrderUseCase implements IOrderServicePort {
         }
         
         order.setIdClient(requestClient.getId());
+        order.setClientPhone(requestClient.getPhone());
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         order.setState(OrderStateEnum.PENDING);
@@ -99,9 +103,9 @@ public class OrderUseCase implements IOrderServicePort {
                                                               int size) {
         Page<Order> orders = null;
         String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
-        User requestUser = userMSClientPort.getUserByMail(authHeader, requestUserMail);
-        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestUser.getId())){
-            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestUser.getId());
+        User requestEmployee = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestEmployee.getId())){
+            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestEmployee.getId());
             if (state == null){
                 throw new StateFilterEmptyException();
             } else {
@@ -117,17 +121,42 @@ public class OrderUseCase implements IOrderServicePort {
     @Override
     public void assignEmployeeToOrder(String authHeader, Long idOrder) {
         String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
-        User requestUser = userMSClientPort.getUserByMail(authHeader, requestUserMail);
-        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestUser.getId())){
-            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestUser.getId());
+        User requestEmployee = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestEmployee.getId())){
+            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestEmployee.getId());
             Order existingOrder = orderPersistencePort.getOrderById(idOrder);
             if (!existingOrder.getRestaurant().getId().equals(idRestaurant)){
                 throw new EmployeeInvalidOperationException();
             }
             if (existingOrder.getIdChef() == null && existingOrder.getState() == OrderStateEnum.PENDING){
-                existingOrder.setIdChef(requestUser.getId());
+                existingOrder.setIdChef(requestEmployee.getId());
                 existingOrder.setState(existingOrder.getState().nextState());
+                existingOrder.setUpdatedAt(LocalDateTime.now());
                 orderPersistencePort.updateOrder(existingOrder);
+            }
+        }
+    }
+    
+    @Override
+    public void setOrderReady(String authHeader, Long idOrder) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestEmployee = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestEmployee.getId())){
+            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestEmployee.getId());
+            Restaurant currentRestaurant = restaurantPersistencePort.getRestaurantById(idRestaurant);
+            Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+            if (!existingOrder.getRestaurant().getId().equals(idRestaurant) || !existingOrder.getIdChef().equals(requestEmployee.getId())){
+                throw new EmployeeInvalidOperationException();
+            }
+            if (existingOrder.getState() == OrderStateEnum.PREPARING){
+                existingOrder.setPin(orderUtils.generateOrderPIN());
+                existingOrder.setState(existingOrder.getState().nextState());
+                existingOrder.setUpdatedAt(LocalDateTime.now());
+                orderPersistencePort.updateOrder(existingOrder);
+                if (!messengerMSClientPort.sendOrderReadyMessage(existingOrder.getClientPhone(), currentRestaurant.getPhone(),
+                                                                 currentRestaurant.getName(), existingOrder.getPin())){
+                    throw new MessageNotSentException();
+                }
             }
         }
     }

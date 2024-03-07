@@ -2,6 +2,7 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
@@ -52,6 +53,9 @@ public class OrderUseCaseTest {
     @Mock
     private OrderUtils orderUtils;
     
+    @Mock
+    private IMessengerMSClientPort messengerMSClientPort;
+    
     @InjectMocks
     private OrderUseCase orderUseCase;
     
@@ -65,7 +69,7 @@ public class OrderUseCaseTest {
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"),
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
                                 null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
@@ -95,7 +99,7 @@ public class OrderUseCaseTest {
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"),
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
                                 null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
@@ -117,7 +121,7 @@ public class OrderUseCaseTest {
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"),
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
                                 null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
@@ -141,8 +145,8 @@ public class OrderUseCaseTest {
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"),
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
-                                null, restaurant , List.of(orderDish), 20000, "1234");
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
         when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
@@ -167,8 +171,9 @@ public class OrderUseCaseTest {
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
         OrderDish orderDish2 = new OrderDish(1L, new Order(), dish, 3);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
-                                null, restaurant , List.of(orderDish, orderDish2), 20000, "1234");
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null, restaurant , List.of(orderDish, orderDish2), 20000,
+                                "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
         when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
@@ -195,8 +200,9 @@ public class OrderUseCaseTest {
                              "Descripción", 10000, restaurant, "www.image.com", false);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, 2);
         OrderDish orderDish2 = new OrderDish(2L, new Order(), dish2, 3);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
-                                null, restaurant , List.of(orderDish, orderDish2), 20000, "1234");
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null, restaurant , List.of(orderDish, orderDish2), 20000,
+                                "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
         when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
@@ -221,7 +227,7 @@ public class OrderUseCaseTest {
         Dish dish = new Dish(1L, "Dish", new Category(1L, "Categoría", "Descripción"),
                              "Descripción", 10000, restaurant, "www.image.com", true);
         OrderDish orderDish = new OrderDish(1L, new Order(), dish, -2);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING,
                                 null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
@@ -251,7 +257,7 @@ public class OrderUseCaseTest {
         when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
         when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
         List<Order> orderList = List.of(
-                new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
+                new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
                           new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321",
                                          "www.logo.com", 2L),
                           List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish", new Category(1L,"Categoría","Descripción"),
@@ -300,7 +306,8 @@ public class OrderUseCaseTest {
                                      new Role(3L, "ROLE_EMPLEADO", "Empleado")));
         when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
         when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
                                 new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
                                                2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
                                                                                                     new Category(1L,
@@ -335,7 +342,7 @@ public class OrderUseCaseTest {
                                      new Role(3L, "ROLE_EMPLEADO", "Empleado")));
         when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
         when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
-        Order order = new Order(1L, 4L, LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(), OrderStateEnum.PENDING, null,
                                 new Restaurant(2L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
                                                2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
                                                                                                     new Category(1L,
@@ -353,6 +360,125 @@ public class OrderUseCaseTest {
                                                                           2)), 20000, null);
         when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
         assertThrows(EmployeeInvalidOperationException.class, () -> orderUseCase.assignEmployeeToOrder(authHeader, 1L));
+    }
+    
+    @Test
+    void setOrderReady_allValid_callsPersistencePort_and_messengerMSClientPort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(3L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"employee@mail.com", "password",
+                                     new Role(3L, "ROLE_EMPLEADO", "Empleado")));
+        when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
+        when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PREPARING, 3L,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        when(orderUtils.generateOrderPIN()).thenReturn("1234");
+        when(messengerMSClientPort.sendOrderReadyMessage("+573107654321", "+573101234567", "Restaurant", "1234"))
+                .thenReturn(true);
+        orderUseCase.setOrderReady(authHeader, 1L);
+        verify(orderPersistencePort, times(1)).updateOrder(order);
+        verify(messengerMSClientPort, times(1)).sendOrderReadyMessage("+573107654321", "+573101234567", "Restaurant", "1234");
+    }
+    
+    @Test
+    void setOrderReady_invalidOrder_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(3L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"employee@mail.com", "password",
+                                     new Role(3L, "ROLE_EMPLEADO", "Empleado")));
+        when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
+        when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PREPARING, 3L,
+                                new Restaurant(2L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        assertThrows(EmployeeInvalidOperationException.class, () -> orderUseCase.setOrderReady(authHeader, 1L));
+    }
+    
+    @Test
+    void setOrderReady_sendOrderReadyMessageFails_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(3L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"employee@mail.com", "password",
+                                     new Role(3L, "ROLE_EMPLEADO", "Empleado")));
+        when(restaurantEmployeeServicePort.validateEmployeeExistsInternal(3L)).thenReturn(true);
+        when(restaurantEmployeeServicePort.getRestaurantId(3L)).thenReturn(1L);
+        Restaurant restaurant = new Restaurant(1L, "Restaurant", "123456789", "Calle 123",
+                                               "+573101234567", "www.logo.com", 2L);
+        when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PREPARING, 3L,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        when(orderUtils.generateOrderPIN()).thenReturn("1234");
+        when(messengerMSClientPort.sendOrderReadyMessage("+573107654321", "+573101234567", "Restaurant", "1234"))
+                .thenReturn(false);
+        assertThrows(MessageNotSentException.class, () -> orderUseCase.setOrderReady(authHeader, 1L));
     }
     
     

@@ -6,8 +6,10 @@ import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePor
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderPersistencePort;
 
 import java.util.List;
+import java.util.Random;
 
 public class OrderUtils {
+    private static final Random ranGenerator = new Random();
     private final IOrderPersistencePort orderPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     
@@ -26,5 +28,9 @@ public class OrderUtils {
             }
         }
         return totalPrice;
+    }
+    
+    public String generateOrderPIN(){
+        return Integer.toString(ranGenerator.nextInt(999999) + 100000);
     }
 }

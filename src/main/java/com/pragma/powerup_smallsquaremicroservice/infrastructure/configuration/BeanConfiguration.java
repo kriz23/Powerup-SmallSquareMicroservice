@@ -1,11 +1,14 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.configuration;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.*;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.usecase.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderUtils;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.adapter.MessengerFeignClientAdapter;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.adapter.UserFeignClientAdapter;
+import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.feignclient.IMessengerFeignClient;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.feignclient.IUserFeignClient;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.http.mapper.IUserMSClientResponseMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter.*;
@@ -20,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfiguration {
     private final IJwtServicePort jwtServicePort;
     private final IUserFeignClient userFeignClient;
+    private final IMessengerFeignClient messengerFeignClient;
     private final IUserMSClientResponseMapper userMSClientResponseMapper;
     private final IRestaurantRepository restaurantRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;
@@ -97,9 +101,14 @@ public class BeanConfiguration {
     }
     
     @Bean
+    public IMessengerMSClientPort messengerMSClientPort(){
+        return new MessengerFeignClientAdapter(messengerFeignClient);
+    }
+    
+    @Bean
     public IOrderServicePort orderServicePort(){
         return new OrderUseCase(orderPersistencePort(), orderDishPersistencePort(), restaurantPersistencePort(),
                                 dishPersistencePort(), restaurantEmployeeServicePort(), userMSClientPort(),
-                                jwtServicePort, orderUtils());
+                                jwtServicePort, orderUtils(), messengerMSClientPort());
     }
 }

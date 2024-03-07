@@ -20,6 +20,7 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long idClient;
+    private String clientPhone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     @Enumerated(EnumType.STRING)
