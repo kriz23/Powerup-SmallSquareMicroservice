@@ -13,4 +13,5 @@ public interface IOrderHandler {
                                                                   HttpServletRequest request);
     void assignEmployeeToOrder(Long idOrder, HttpServletRequest request);
     void setOrderReady(Long idOrder, HttpServletRequest request);
+    void setOrderDelivered(Long idOrder, String orderPIN, HttpServletRequest request);
 }

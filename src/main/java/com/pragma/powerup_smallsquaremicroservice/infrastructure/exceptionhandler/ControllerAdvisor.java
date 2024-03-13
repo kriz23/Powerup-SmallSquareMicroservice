@@ -185,6 +185,13 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.MESSAGE_NOT_SENT_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(OrderInvalidDeliveryException.class)
+    public ResponseEntity<Map<String, String>> handleOrderInvalidDeliveryException(
+            OrderInvalidDeliveryException ignoredOrderInvalidDeliveryException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.ORDER_INVALID_DELIVERY_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(
