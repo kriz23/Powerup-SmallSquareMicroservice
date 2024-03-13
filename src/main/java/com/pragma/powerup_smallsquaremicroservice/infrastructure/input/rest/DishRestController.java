@@ -30,7 +30,7 @@ public class DishRestController {
     @Operation(summary = "Create a new dish")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Owner created", content = @Content),
             @ApiResponse(responseCode = "409", description = "Dish already exists", content = @Content)})
-    @PostMapping("/restaurants/{id}/dishes")
+    @PostMapping("/owners/restaurants/{id}/dishes")
     @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<Void> createDish(@Parameter(description = "Restaurant id") @PathVariable Long id,
                                            @RequestBody DishRequestDto dishRequestDto,
@@ -44,7 +44,7 @@ public class DishRestController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Desired owner returned", content =
     @Content(mediaType = "application/json", schema = @Schema(implementation = DishResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
-    @GetMapping("/dishes/{id}")
+    @GetMapping("/owners/dishes/{id}")
     @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<DishResponseDto> getDish(@Parameter(description = "Dish id") @PathVariable Long id) {
         return ResponseEntity.ok(dishHandler.getDishById(id));
@@ -53,7 +53,7 @@ public class DishRestController {
     @Operation(summary = "Update desired dish")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Dish updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
-    @PutMapping("/dishes/{id}")
+    @PutMapping("/owners/dishes/{id}")
     @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<Void> updateDish(@Parameter(description = "Dish id")
                                            @PathVariable Long id,
@@ -66,7 +66,7 @@ public class DishRestController {
     @Operation(summary = "Update desired dish status")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Dish status updated", content = @Content),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
-    @PutMapping("/dishes/enable-disable/{id}")
+    @PutMapping("/owners/dishes/enable-disable/{id}")
     @PreAuthorize("hasRole('PROPIETARIO')")
     public ResponseEntity<Void> updateDishStatus(@Parameter(description = "Dish id") @PathVariable Long id,
                                                  @Parameter(description = "Dish status") @RequestParam String dishAvailableStatus,

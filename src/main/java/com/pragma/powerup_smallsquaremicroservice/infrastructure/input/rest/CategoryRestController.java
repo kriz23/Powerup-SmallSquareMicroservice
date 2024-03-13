@@ -20,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "Category Rest Controller", description = "Rest controller for category operations")
 @RestController
-@RequestMapping("/api/v1/smallsquare/categories")
+@RequestMapping("/api/v1/smallsquare")
 @RequiredArgsConstructor
 public class CategoryRestController {
     private final ICategoryHandler categoryHandler;
@@ -30,7 +30,7 @@ public class CategoryRestController {
     @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation =
             CategoryResponseDto.class)))), @ApiResponse(responseCode = "404", description = "No data found", content =
     @Content)})
-    @GetMapping("/")
+    @GetMapping("/admins/categories")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<CategoryResponseDto>> getAllCategories(){
         return ResponseEntity.ok(categoryHandler.getAllCategories());
