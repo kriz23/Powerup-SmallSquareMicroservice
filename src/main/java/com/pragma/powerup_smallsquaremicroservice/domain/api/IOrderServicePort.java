@@ -9,4 +9,5 @@ public interface IOrderServicePort {
     Page<Order> getOrdersFromRestaurantByStatePageable(String authHeader, OrderStateEnum state, int page, int size);
     void assignEmployeeToOrder(String authHeader, Long idOrder);
     void setOrderReady(String authHeader, Long idOrder);
+    void setOrderDelivered(String authHeader, Long idOrder, String orderPIN);
 }

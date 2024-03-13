@@ -86,4 +86,17 @@ public class OrderRestController {
         orderHandler.setOrderReady(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    
+    @Operation(summary = "Update order to delivered | Deliver an order")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "403", description = "User not allowed for this operation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/employees/orders/deliver/{id}")
+    @PreAuthorize("hasRole('EMPLEADO')")
+    public ResponseEntity<Void> setOrderDelivered(@Parameter(description = "Order id") @PathVariable Long id,
+                                                  @RequestParam String orderPIN,
+                                                  HttpServletRequest request){
+        orderHandler.setOrderDelivered(id, orderPIN, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

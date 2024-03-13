@@ -160,4 +160,24 @@ public class OrderUseCase implements IOrderServicePort {
             }
         }
     }
+    
+    @Override
+    public void setOrderDelivered(String authHeader, Long idOrder, String orderPIN) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestEmployee = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        if (restaurantEmployeeServicePort.validateEmployeeExistsInternal(requestEmployee.getId())){
+            Long idRestaurant = restaurantEmployeeServicePort.getRestaurantId(requestEmployee.getId());
+            Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+            if (!existingOrder.getRestaurant().getId().equals(idRestaurant)){
+                throw new EmployeeInvalidOperationException();
+            }
+            if (existingOrder.getState() == OrderStateEnum.READY && existingOrder.getPin().equals(orderPIN)){
+                existingOrder.setState(existingOrder.getState().nextState());
+                existingOrder.setUpdatedAt(LocalDateTime.now());
+                orderPersistencePort.updateOrder(existingOrder);
+            } else {
+                throw new OrderInvalidDeliveryException();
+            }
+        }
+    }
 }

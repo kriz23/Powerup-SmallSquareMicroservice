@@ -47,4 +47,10 @@ public class OrderHandler implements IOrderHandler {
         String authHeader = request.getHeader("Authorization");
         orderServicePort.setOrderReady(authHeader, idOrder);
     }
+    
+    @Override
+    public void setOrderDelivered(Long idOrder, String orderPIN, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        orderServicePort.setOrderDelivered(authHeader, idOrder, orderPIN);
+    }
 }
