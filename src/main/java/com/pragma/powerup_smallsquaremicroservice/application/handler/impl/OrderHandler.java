@@ -60,4 +60,10 @@ public class OrderHandler implements IOrderHandler {
         String authHeader = request.getHeader("Authorization");
         return orderResponseMapper.orderListToOrderResponseDtoList(orderServicePort.getClientPendingOrders(authHeader));
     }
+    
+    @Override
+    public void cancelOrder(Long idOrder, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        orderServicePort.cancelOrder(authHeader, idOrder);
+    }
 }

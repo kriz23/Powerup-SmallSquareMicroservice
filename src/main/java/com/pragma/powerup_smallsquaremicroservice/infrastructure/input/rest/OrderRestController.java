@@ -113,4 +113,15 @@ public class OrderRestController {
         return ResponseEntity.ok(orderHandler.getClientPendingOrders(request));
     }
     
+    @Operation(summary = "Cancel order")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "403", description = "User not allowed for this operation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/clients/orders/cancel/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Void> setOrderCancelled(@Parameter(description = "Order id") @PathVariable Long id,
+                                                 HttpServletRequest request){
+        orderHandler.cancelOrder(id, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

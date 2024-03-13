@@ -187,4 +187,22 @@ public class OrderUseCase implements IOrderServicePort {
         User requestClient = userMSClientPort.getUserByMail(authHeader, requestUserMail);
         return orderPersistencePort.getClientPendingOrders(requestClient.getId());
     }
+    
+    @Override
+    public void cancelOrder(String authHeader, Long idOrder) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestClient = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+        if  (!existingOrder.getIdClient().equals(requestClient.getId())){
+            throw new ClientInvalidOperationException();
+        }
+        if (existingOrder.getState().isCancelable()){
+            existingOrder.setState(OrderStateEnum.CANCELLED);
+            existingOrder.setUpdatedAt(LocalDateTime.now());
+            orderPersistencePort.updateOrder(existingOrder);
+        } else {
+            throw new OrderNotCancelableException();
+            // If needed, put the call to messengerMSClientPort here
+        }
+    }
 }

@@ -16,4 +16,5 @@ public interface IOrderHandler {
     void setOrderReady(Long idOrder, HttpServletRequest request);
     void setOrderDelivered(Long idOrder, String orderPIN, HttpServletRequest request);
     List<OrderResponseDto> getClientPendingOrders(HttpServletRequest request);
+    void cancelOrder(Long idOrder, HttpServletRequest request);
 }

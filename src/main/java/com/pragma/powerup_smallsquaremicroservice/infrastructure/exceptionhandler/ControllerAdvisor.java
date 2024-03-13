@@ -192,6 +192,20 @@ public class ControllerAdvisor {
                 Collections.singletonMap(MESSAGE, ExceptionResponse.ORDER_INVALID_DELIVERY_EXCEPTION.getMessage()));
     }
     
+    @ExceptionHandler(ClientInvalidOperationException.class)
+    public ResponseEntity<Map<String, String>> handleClientInvalidOperationException(
+            ClientInvalidOperationException ignoredClientInvalidOperationException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.CLIENT_INVALID_OPERATION_EXCEPTION.getMessage()));
+    }
+    
+    @ExceptionHandler(OrderNotCancelableException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotCancelableException(
+            OrderNotCancelableException ignoredOrderNotCancelableException) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                Collections.singletonMap(MESSAGE, ExceptionResponse.ORDER_NOT_CANCELABLE_EXCEPTION.getMessage()));
+    }
+    
     // --FEIGN EXCEPTIONS--
     @ExceptionHandler(OwnerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleOwnerNotFoundException(

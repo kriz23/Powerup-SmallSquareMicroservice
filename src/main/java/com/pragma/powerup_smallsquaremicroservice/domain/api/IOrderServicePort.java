@@ -13,4 +13,5 @@ public interface IOrderServicePort {
     void setOrderReady(String authHeader, Long idOrder);
     void setOrderDelivered(String authHeader, Long idOrder, String orderPIN);
     List<Order> getClientPendingOrders(String authHeader);
+    void cancelOrder(String authHeader, Long idOrder);
 }

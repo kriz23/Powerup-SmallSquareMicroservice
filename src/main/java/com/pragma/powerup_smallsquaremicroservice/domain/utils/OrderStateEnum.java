@@ -37,11 +37,11 @@ public enum OrderStateEnum {
         return orderState.getStateNumber() - this.stateNumber == 1;
     }
     
-    public boolean isAfer(OrderStateEnum orderState) {
+    public boolean isAfter(OrderStateEnum orderState) {
         return this.stateNumber - orderState.getStateNumber() == -1;
     }
     
-    public boolean isCancellable() {
+    public boolean isCancelable() {
         return this.stateNumber == 1;
     }
     
