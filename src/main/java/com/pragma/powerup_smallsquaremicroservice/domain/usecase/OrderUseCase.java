@@ -180,4 +180,11 @@ public class OrderUseCase implements IOrderServicePort {
             }
         }
     }
+    
+    @Override
+    public List<Order> getClientPendingOrders(String authHeader) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestClient = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        return orderPersistencePort.getClientPendingOrders(requestClient.getId());
+    }
 }

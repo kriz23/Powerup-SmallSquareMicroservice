@@ -585,4 +585,19 @@ public class OrderUseCaseTest {
         assertThrows(OrderInvalidDeliveryException.class, () -> orderUseCase.setOrderDelivered(authHeader, 1L,
                                                                                                    "654321"));
     }
+    
+    @Test
+    void getClientPendingOrders_callsPersistencePort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        orderUseCase.getClientPendingOrders(authHeader);
+        verify(orderPersistencePort, times(1)).getClientPendingOrders(4L);
+    }
 }

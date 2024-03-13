@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +53,11 @@ public class OrderHandler implements IOrderHandler {
     public void setOrderDelivered(Long idOrder, String orderPIN, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         orderServicePort.setOrderDelivered(authHeader, idOrder, orderPIN);
+    }
+    
+    @Override
+    public List<OrderResponseDto> getClientPendingOrders(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return orderResponseMapper.orderListToOrderResponseDtoList(orderServicePort.getClientPendingOrders(authHeader));
     }
 }
