@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Tag(name = "Order Rest Controller", description = "Rest controller for order operations")
 @RestController
@@ -97,6 +98,30 @@ public class OrderRestController {
                                                   @RequestParam String orderPIN,
                                                   HttpServletRequest request){
         orderHandler.setOrderDelivered(id, orderPIN, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @Operation(summary = "Get client pending orders")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "All categories returned", content =
+    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation =
+            OrderResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not allowed for this " +
+            "operation", content = @Content), @ApiResponse(responseCode = "404", description = "No data found",
+            content = @Content)})
+    @GetMapping("/clients/orders/pending")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<List<OrderResponseDto>> getClientPendingOrders(HttpServletRequest request){
+        return ResponseEntity.ok(orderHandler.getClientPendingOrders(request));
+    }
+    
+    @Operation(summary = "Cancel order")
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "403", description = "User not allowed for this operation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @PutMapping("/clients/orders/cancel/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Void> setOrderCancelled(@Parameter(description = "Order id") @PathVariable Long id,
+                                                 HttpServletRequest request){
+        orderHandler.cancelOrder(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

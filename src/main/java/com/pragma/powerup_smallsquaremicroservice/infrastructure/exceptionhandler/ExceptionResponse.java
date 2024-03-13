@@ -28,6 +28,8 @@ public enum ExceptionResponse {
     EMPLOYEE_INVALID_OPERATION_EXCEPTION("The employee cannot perform this operation"),
     MESSAGE_NOT_SENT_EXCEPTION("The message to the client could not be sent"),
     ORDER_INVALID_DELIVERY_EXCEPTION("The order you are trying to deliver is not READY or the PIN you entered is invalid"),
+    CLIENT_INVALID_OPERATION_EXCEPTION("Sorry, you cannot perform this operation"),
+    ORDER_NOT_CANCELABLE_EXCEPTION("The order you are trying to cancel is not PENDING"),
     // --FEIGN EXCEPTIONS--
     OWNER_NOT_FOUND_EXCEPTION("The owner you entered does not exist"),
     ROLE_NOT_ALLOWED_EXCEPTION("The user's role you entered is not allowed for this operation"),

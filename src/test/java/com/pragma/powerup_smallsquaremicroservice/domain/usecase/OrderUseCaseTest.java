@@ -585,4 +585,116 @@ public class OrderUseCaseTest {
         assertThrows(OrderInvalidDeliveryException.class, () -> orderUseCase.setOrderDelivered(authHeader, 1L,
                                                                                                    "654321"));
     }
+    
+    @Test
+    void getClientPendingOrders_callsPersistencePort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        orderUseCase.getClientPendingOrders(authHeader);
+        verify(orderPersistencePort, times(1)).getClientPendingOrders(4L);
+    }
+    
+    @Test
+    void cancelOrder_allValid_callsPersistencePort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        orderUseCase.cancelOrder(authHeader, 1L);
+        verify(orderPersistencePort, times(1)).updateOrder(order);
+    }
+    
+    @Test
+    void cancelOrder_invalidOrderClient_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        Order order = new Order(1L, 5L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        assertThrows(ClientInvalidOperationException.class, () -> orderUseCase.cancelOrder(authHeader, 1L));
+    }
+    
+    @Test
+    void cancelOrder_invalidOrderState_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.READY, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        assertThrows(OrderNotCancelableException.class, () -> orderUseCase.cancelOrder(authHeader, 1L));
+    }
 }

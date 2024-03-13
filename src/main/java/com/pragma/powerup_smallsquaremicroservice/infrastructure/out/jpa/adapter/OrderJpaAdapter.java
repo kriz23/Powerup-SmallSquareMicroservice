@@ -50,4 +50,10 @@ public class OrderJpaAdapter implements IOrderPersistencePort {
     public void updateOrder(Order order) {
         orderRepository.save(orderEntityMapper.orderToOrderEntity(order));
     }
+    
+    @Override
+    public List<Order> getClientPendingOrders(Long idClient) {
+        List<OrderEntity> clientPendingOrders = orderRepository.findByIdClientAndState(idClient, OrderStateEnum.PENDING);
+        return orderEntityMapper.orderEntityListToOrderList(clientPendingOrders);
+    }
 }
