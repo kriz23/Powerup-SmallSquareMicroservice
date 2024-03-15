@@ -8,4 +8,5 @@ public interface ITraceabilityMSClientPort {
     void createOrderTrace(OrderTrace orderTrace);
     void updateOrderTrace(OrderTrace orderTrace);
     List<OrderTrace> getOrderTracesByIdOrder(Long idOrder);
+    String getOrderDurationByIdOrder(Long idOrder);
 }

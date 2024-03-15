@@ -24,9 +24,9 @@ public class RestaurantEmployeeUseCase implements IRestaurantEmployeeServicePort
     }
     
     @Override
-    public boolean assignEmployeeToRestaurant(String authHeader, Long idRestaurant, Long idEmployee) {
+    public boolean assignEmployeeToRestaurant(String authHeader, Long idEmployee, Long idRestaurant) {
         if (restaurantServicePort.validateRestaurantOwnership(authHeader, idRestaurant)){
-            restaurantEmployeePersistencePort.assignEmployeeToRestaurant(idRestaurant, idEmployee);
+            restaurantEmployeePersistencePort.assignEmployeeToRestaurant(idEmployee, idRestaurant);
             return true;
         }
         return false;

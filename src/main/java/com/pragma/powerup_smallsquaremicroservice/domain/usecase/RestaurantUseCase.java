@@ -14,6 +14,7 @@ import com.pragma.powerup_smallsquaremicroservice.domain.utils.Constants;
 import feign.FeignException;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class RestaurantUseCase implements IRestaurantServicePort {
@@ -66,6 +67,13 @@ public class RestaurantUseCase implements IRestaurantServicePort {
             }
         }
         return activeDishes;
+    }
+    
+    @Override
+    public List<Restaurant> getAllRestaurantsByIdOwner(String authHeader) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestOwner = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        return restaurantPersistencePort.getAllRestaurantsByIdOwner(requestOwner.getId());
     }
     
     

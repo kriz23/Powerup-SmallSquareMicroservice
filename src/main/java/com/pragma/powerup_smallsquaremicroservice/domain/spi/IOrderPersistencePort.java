@@ -13,4 +13,5 @@ public interface IOrderPersistencePort {
     Order getOrderById(Long idOrder);
     void updateOrder(Order order);
     List<Order> getClientPendingOrders(Long idClient);
+    List<Order> getDeliveredOrdersByIdEmployee(Long idEmployee);
 }

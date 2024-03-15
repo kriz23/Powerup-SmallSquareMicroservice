@@ -31,8 +31,8 @@ class RestaurantEmployeeUseCaseTest {
         Long idEmployee = 1L;
         when(restaurantServicePort.validateRestaurantOwnership(authHeader, idRestaurant)).thenReturn(true);
         
-        assertTrue(restaurantEmployeeUseCase.assignEmployeeToRestaurant(authHeader, idRestaurant, idEmployee));
-        verify(restaurantEmployeePersistencePort, times(1)).assignEmployeeToRestaurant(idRestaurant, idEmployee);
+        assertTrue(restaurantEmployeeUseCase.assignEmployeeToRestaurant(authHeader, idEmployee, idRestaurant));
+        verify(restaurantEmployeePersistencePort, times(1)).assignEmployeeToRestaurant(idEmployee, idRestaurant);
     }
     
     @Test
@@ -43,7 +43,7 @@ class RestaurantEmployeeUseCaseTest {
         
         when(restaurantServicePort.validateRestaurantOwnership(authHeader, idRestaurant)).thenReturn(false);
         
-        assertFalse(restaurantEmployeeUseCase.assignEmployeeToRestaurant(authHeader, idRestaurant, idEmployee));
+        assertFalse(restaurantEmployeeUseCase.assignEmployeeToRestaurant(authHeader, idEmployee, idRestaurant));
     }
     
     @Test

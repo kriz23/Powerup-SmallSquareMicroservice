@@ -2,15 +2,13 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.ITraceabilityMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderUtils;
 import org.junit.jupiter.api.Test;
@@ -25,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +36,9 @@ public class OrderUseCaseTest {
     private IOrderDishPersistencePort orderDishPersistencePort;
     
     @Mock
+    private IRestaurantServicePort restaurantServicePort;
+    
+    @Mock
     private IRestaurantPersistencePort restaurantPersistencePort;
     
     @Mock
@@ -44,6 +46,9 @@ public class OrderUseCaseTest {
     
     @Mock
     private IRestaurantEmployeeServicePort restaurantEmployeeServicePort;
+    
+    @Mock
+    private IRestaurantEmployeePersistencePort restaurantEmployeePersistencePort;
     
     @Mock
     private IUserMSClientPort userMSClientPort;
@@ -770,5 +775,94 @@ public class OrderUseCaseTest {
                                                                           2)), 20000, null);
         when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
         assertThrows(ClientInvalidOperationException.class, () -> orderUseCase.getOrderTracesByIdOrder(authHeader, 1L));
+    }
+    
+    @Test
+    void getOrderDurationByIdOrder_callsTraceabilityMSClientPort(){
+        String authHeader = "validHeader";
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        when(restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, 1L)).thenReturn(true);
+        when(traceabilityMSClientPort.getOrderDurationByIdOrder(order.getId())).thenReturn("00:30:00");
+        orderUseCase.getOrderDurationByIdOrder(authHeader, order.getId());
+        verify(traceabilityMSClientPort, times(1)).getOrderDurationByIdOrder(order.getId());
+    }
+    
+    @Test
+    void getOrderDurationByIdOrder_invalidOrder_returnsNull(){
+        String authHeader = "validHeader";
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        when(restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, 1L)).thenReturn(false);
+        
+        assertNull(orderUseCase.getOrderDurationByIdOrder(authHeader, order.getId()));
+    }
+    
+    @Test
+    void calculateAverageDeliveredOrdersPerformanceByEmployee_callsTraceabilityMSClientPort(){
+        when(orderPersistencePort.getDeliveredOrdersByIdEmployee(3L)).thenReturn(
+                List.of(new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                  OrderStateEnum.DELIVERED, 3L,
+                                  new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                                 2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                      new Category(1L,
+                                                                                                                   "Categoría",
+                                                                                                                   "Descripción"),
+                                                                                                      "Descripción", 10000,
+                                                                                                      new Restaurant(1L,
+                                                                                                                     "Restaurant",
+                                                                                                                     "123456789",
+                                                                                                                     "Calle 123",
+                                                                                                                     "+573107654321",
+                                                                                                                     "www.logo.com",
+                                                                                                                     2L),
+                                                                                                      "www.image.com", true),
+                                                                            2)), 20000, "123456")));
+        when(traceabilityMSClientPort.getOrderDurationByIdOrder(1L)).thenReturn("PT3M10.234181S");
+        orderUseCase.calculateAverageDeliveredOrdersPerformanceByEmployee(3L);
+        verify(traceabilityMSClientPort, times(1)).getOrderDurationByIdOrder(1L);
+    }
+    
+    @Test
+    void getEmployeesRanking_returnsRanking(){
+        String authHeader = "validHeader";
+        when(restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, 1L)).thenReturn(true);
+        when(restaurantEmployeePersistencePort.getEmployeesByIdRestaurant(1L)).thenReturn(
+                List.of(new RestaurantEmployee(1L, 3L, 1L))
+                                                                                         );
+        orderUseCase.getEmployeesRanking(authHeader, 1L);
+        verify(restaurantEmployeePersistencePort, times(1)).getEmployeesByIdRestaurant(1L);
     }
 }

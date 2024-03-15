@@ -19,4 +19,7 @@ public interface ITraceabilityFeignClient {
     @GetMapping("/traceability/orderTrace/{idOrder}")
     List<OrderTraceMSResponseDto> getOrderTracesByIdOrder(@PathVariable("idOrder") Long idOrder);
     
+    @GetMapping("/traceability/orderTrace/duration/{idOrder}")
+    String getOrderDurationByIdOrder(@PathVariable("idOrder") Long idOrder);
+    
 }

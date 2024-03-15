@@ -13,7 +13,7 @@ import java.util.List;
 public interface IRestaurantResponseMapper {
     RestaurantResponseDto restaurantToRestaurantResponseDto(Restaurant restaurant);
     
-    List<RestaurantResponseDto> restaurantToResponseDtoList(List<Restaurant> restaurantList);
+    List<RestaurantResponseDto> restaurantListToRestaurantResponseDtoList(List<Restaurant> restaurantList);
     
     RestaurantSimpleResponseDto restaurantToRestaurantSimpleResponseDto(Restaurant restaurant);
 }

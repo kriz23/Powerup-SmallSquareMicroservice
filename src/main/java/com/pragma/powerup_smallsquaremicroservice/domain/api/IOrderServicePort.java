@@ -1,5 +1,6 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.api;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.model.EmployeeRanking;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Order;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.OrderTrace;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
@@ -16,4 +17,7 @@ public interface IOrderServicePort {
     List<Order> getClientPendingOrders(String authHeader);
     void cancelOrder(String authHeader, Long idOrder);
     List<OrderTrace> getOrderTracesByIdOrder(String authHeader, Long idOrder);
+    String getOrderDurationByIdOrder(String authHeader, Long idOrder);
+    String calculateAverageDeliveredOrdersPerformanceByEmployee(Long idEmployee);
+    List<EmployeeRanking> getEmployeesRanking(String authHeader, Long idRestaurant);
 }

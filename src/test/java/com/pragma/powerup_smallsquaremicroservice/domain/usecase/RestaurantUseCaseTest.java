@@ -94,6 +94,23 @@ class RestaurantUseCaseTest {
     }
     
     @Test
+    void getAllRestaurantsByIdOwner_callsPersistencePort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(2L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"owner@mail.com", "password",
+                                     new Role(2L, "ROLE_PROPIETARIO", "Propietario")));
+        
+        restaurantUseCase.getAllRestaurantsByIdOwner(authHeader);
+        
+        verify(restaurantPersistencePort, times(1)).getAllRestaurantsByIdOwner(2L);
+    }
+    
+    @Test
     void validateName_validName_returnsTrue(){
         String name = "Restaurant";
         

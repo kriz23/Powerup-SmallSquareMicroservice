@@ -3,31 +3,30 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.ITraceabilityMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderDishPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IOrderPersistencePort;
-import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantPersistencePort;
+import com.pragma.powerup_smallsquaremicroservice.domain.spi.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderUtils;
 import org.springframework.data.domain.Page;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class OrderUseCase implements IOrderServicePort {
     private final IOrderPersistencePort orderPersistencePort;
     private final IOrderDishPersistencePort orderDishPersistencePort;
+    private final IRestaurantServicePort restaurantServicePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantEmployeeServicePort restaurantEmployeeServicePort;
+    private final IRestaurantEmployeePersistencePort restaurantEmployeePersistencePort;
     private final IUserMSClientPort userMSClientPort;
     private final IJwtServicePort jwtServicePort;
     private final OrderUtils orderUtils;
@@ -35,15 +34,18 @@ public class OrderUseCase implements IOrderServicePort {
     private final ITraceabilityMSClientPort traceabilityMSClientPort;
     
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderDishPersistencePort orderDishPersistencePort,
-                        IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort,
-                        IRestaurantEmployeeServicePort restaurantEmployeeServicePort, IUserMSClientPort userMSClientPort,
-                        IJwtServicePort jwtServicePort, OrderUtils orderUtils, IMessengerMSClientPort messengerMSClientPort,
-                        ITraceabilityMSClientPort traceabilityMSClientPort) {
+                        IRestaurantServicePort restaurantServicePort, IRestaurantPersistencePort restaurantPersistencePort,
+                        IDishPersistencePort dishPersistencePort, IRestaurantEmployeeServicePort restaurantEmployeeServicePort,
+                        IRestaurantEmployeePersistencePort restaurantEmployeePersistencePort,
+                        IUserMSClientPort userMSClientPort, IJwtServicePort jwtServicePort, OrderUtils orderUtils,
+                        IMessengerMSClientPort messengerMSClientPort, ITraceabilityMSClientPort traceabilityMSClientPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
+        this.restaurantServicePort = restaurantServicePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.restaurantEmployeeServicePort = restaurantEmployeeServicePort;
+        this.restaurantEmployeePersistencePort = restaurantEmployeePersistencePort;
         this.userMSClientPort = userMSClientPort;
         this.jwtServicePort = jwtServicePort;
         this.orderUtils = orderUtils;
@@ -248,5 +250,49 @@ public class OrderUseCase implements IOrderServicePort {
             throw new ClientInvalidOperationException();
         }
         return traceabilityMSClientPort.getOrderTracesByIdOrder(idOrder);
+    }
+    
+    @Override
+    public String getOrderDurationByIdOrder(String authHeader, Long idOrder) {
+        Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+        if (restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, existingOrder.getRestaurant().getId())){
+            return traceabilityMSClientPort.getOrderDurationByIdOrder(idOrder);
+        }
+        return null;
+    }
+    
+    @Override
+    public String calculateAverageDeliveredOrdersPerformanceByEmployee(Long idEmployee) {
+        List<Order> employeeOrders = orderPersistencePort.getDeliveredOrdersByIdEmployee(idEmployee);
+        List<Duration> averageDurations = new ArrayList<>();
+        
+        for (Order order : employeeOrders) {
+            String orderDuration = traceabilityMSClientPort.getOrderDurationByIdOrder(order.getId());
+            averageDurations.add(Duration.parse(orderDuration));
+        }
+        Duration average = Duration.ZERO;
+        for (Duration duration : averageDurations) {
+            average = average.plus(duration);
+        }
+        if (!averageDurations.isEmpty()) {
+            average = average.dividedBy(averageDurations.size());
+        }
+        return average.toString();
+    }
+    
+    @Override
+    public List<EmployeeRanking> getEmployeesRanking(String authHeader, Long idRestaurant) {
+        List<EmployeeRanking> employeesRanking = new ArrayList<>();
+        if (restaurantServicePort.validateRestaurantOwnershipInternal(authHeader, idRestaurant)){
+            List<RestaurantEmployee> employees =
+                    restaurantEmployeePersistencePort.getEmployeesByIdRestaurant(idRestaurant);
+            for (RestaurantEmployee employee : employees){
+                String averageEmployeePerformance = calculateAverageDeliveredOrdersPerformanceByEmployee(employee.getIdEmployee());
+                EmployeeRanking employeeRanking = new EmployeeRanking(employee.getIdEmployee(), averageEmployeePerformance);
+                employeesRanking.add(employeeRanking);
+            }
+            employeesRanking.sort(Comparator.comparing(e -> Duration.parse(e.getAverageOrdersPerformance())));
+        }
+        return employeesRanking;
     }
 }

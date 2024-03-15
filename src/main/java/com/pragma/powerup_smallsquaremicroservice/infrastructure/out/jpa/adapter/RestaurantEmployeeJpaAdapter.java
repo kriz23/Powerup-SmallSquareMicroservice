@@ -1,9 +1,12 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.adapter;
 
+import com.pragma.powerup_smallsquaremicroservice.domain.model.RestaurantEmployee;
 import com.pragma.powerup_smallsquaremicroservice.domain.spi.IRestaurantEmployeePersistencePort;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.mapper.IRestaurantEmployeeEntityMapper;
 import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.repository.IRestaurantEmployeeRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class RestaurantEmployeeJpaAdapter implements IRestaurantEmployeePersistencePort {
@@ -11,9 +14,9 @@ public class RestaurantEmployeeJpaAdapter implements IRestaurantEmployeePersiste
     private final IRestaurantEmployeeEntityMapper restaurantEmployeeEntityMapper;
     
     @Override
-    public void assignEmployeeToRestaurant(Long idRestaurant, Long idEmployee) {
+    public void assignEmployeeToRestaurant(Long idEmployee, Long idRestaurant) {
         restaurantEmployeeRepository
-                .save(restaurantEmployeeEntityMapper.restaurantEmployeeToRestaurantEmployeeEntity(idRestaurant, idEmployee));
+                .save(restaurantEmployeeEntityMapper.restaurantEmployeeToRestaurantEmployeeEntity(idEmployee, idRestaurant));
     }
     
     @Override
@@ -24,5 +27,11 @@ public class RestaurantEmployeeJpaAdapter implements IRestaurantEmployeePersiste
     @Override
     public Long getRestaurantId(Long idEmployee) {
         return restaurantEmployeeRepository.findByIdEmployee(idEmployee).getRestaurantEntity().getId();
+    }
+    
+    @Override
+    public List<RestaurantEmployee> getEmployeesByIdRestaurant(Long idRestaurant) {
+        return restaurantEmployeeEntityMapper.restaurantEmployeeEntityListToRestaurantEmployeeList(
+                restaurantEmployeeRepository.findAllByRestaurantEntityId(idRestaurant));
     }
 }

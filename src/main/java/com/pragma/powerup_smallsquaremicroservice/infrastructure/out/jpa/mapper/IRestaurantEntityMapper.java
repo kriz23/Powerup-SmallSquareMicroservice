@@ -5,10 +5,14 @@ import com.pragma.powerup_smallsquaremicroservice.infrastructure.out.jpa.entity.
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, unmappedSourcePolicy =
         ReportingPolicy.IGNORE)
 public interface IRestaurantEntityMapper {
     RestaurantEntity restaurantToRestaurantEntity(Restaurant restaurant);
     
     Restaurant restaurantEntityToRestaurant(RestaurantEntity restaurantEntity);
+    
+    List<Restaurant> restaurantEntityListToRestaurantList(List<RestaurantEntity> restaurantEntityList);
 }

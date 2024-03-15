@@ -120,8 +120,9 @@ public class BeanConfiguration {
     
     @Bean
     public IOrderServicePort orderServicePort(){
-        return new OrderUseCase(orderPersistencePort(), orderDishPersistencePort(), restaurantPersistencePort(),
-                                dishPersistencePort(), restaurantEmployeeServicePort(), userMSClientPort(),
-                                jwtServicePort, orderUtils(), messengerMSClientPort(), traceabilityMSClientPort());
+        return new OrderUseCase(orderPersistencePort(), orderDishPersistencePort(), restaurantServicePort(),
+                                restaurantPersistencePort(), dishPersistencePort(), restaurantEmployeeServicePort(),
+                                restaurantEmployeePersistencePort(), userMSClientPort(), jwtServicePort, orderUtils(),
+                                messengerMSClientPort(), traceabilityMSClientPort());
     }
 }

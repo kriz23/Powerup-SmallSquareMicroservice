@@ -2,16 +2,16 @@ package com.pragma.powerup_smallsquaremicroservice.domain.model;
 
 public class RestaurantEmployee {
     private Long id;
-    private Long idRestaurant;
     private Long idEmployee;
+    private Long idRestaurant;
     
     public RestaurantEmployee() {
     }
     
-    public RestaurantEmployee(Long id, Long idRestaurant, Long idEmployee) {
+    public RestaurantEmployee(Long id, Long idEmployee, Long idRestaurant) {
         this.id = id;
-        this.idRestaurant = idRestaurant;
         this.idEmployee = idEmployee;
+        this.idRestaurant = idRestaurant;
     }
     
     public Long getId() {
@@ -22,6 +22,14 @@ public class RestaurantEmployee {
         this.id = id;
     }
     
+    public Long getIdEmployee() {
+        return idEmployee;
+    }
+    
+    public void setIdEmployee(Long idEmployee) {
+        this.idEmployee = idEmployee;
+    }
+    
     public Long getIdRestaurant() {
         return idRestaurant;
     }
@@ -30,11 +38,4 @@ public class RestaurantEmployee {
         this.idRestaurant = idRestaurant;
     }
     
-    public Long getIdEmployee() {
-        return idEmployee;
-    }
-    
-    public void setIdEmployee(Long idEmployee) {
-        this.idEmployee = idEmployee;
-    }
 }
