@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.infrastructure.input.rest;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.OrderRequestDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderDurationResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderTraceResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IOrderHandler;
@@ -137,6 +138,17 @@ public class OrderRestController {
     public ResponseEntity<List<OrderTraceResponseDto>> getOrderTracesByIdOrder(@Parameter(description = "Order id") @PathVariable Long id,
                                                                                HttpServletRequest request){
         return ResponseEntity.ok(orderHandler.getOrderTracesByIdOrder(id, request));
+    }
+    
+    @Operation(summary = "Get Order duration by id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Order's duration returned ", content =
+    @Content), @ApiResponse(responseCode = "403", description = "User not allowed for this operation", content =
+            @Content), @ApiResponse(responseCode = "404", description = "No data found", content = @Content)})
+    @GetMapping("/owners/orders/duration/{id}")
+    @PreAuthorize("hasRole('PROPIETARIO')")
+    public ResponseEntity<OrderDurationResponseDto> getOrderDurationByIdOrder(@Parameter(description = "Order id") @PathVariable Long id,
+                                                                              HttpServletRequest request){
+        return ResponseEntity.ok(orderHandler.getOrderDurationByIdOrder(id, request));
     }
     
 }

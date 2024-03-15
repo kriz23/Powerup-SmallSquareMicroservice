@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
     
@@ -48,5 +50,10 @@ public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
         Pageable pageableParams = PageRequest.of(page, size, Sort.by("name").ascending());
         Page<RestaurantEntity> sortedPageableRestaurants = restaurantRepository.findAll(pageableParams);
         return sortedPageableRestaurants.map(restaurantEntityMapper::restaurantEntityToRestaurant);
+    }
+    
+    @Override
+    public List<Restaurant> getAllRestaurantsByIdOwner(Long idOwner) {
+        return restaurantEntityMapper.restaurantEntityListToRestaurantList(restaurantRepository.findAllByIdOwner(idOwner));
     }
 }

@@ -29,4 +29,9 @@ public class TraceabilityFeignClientAdapter implements ITraceabilityMSClientPort
     public List<OrderTrace> getOrderTracesByIdOrder(Long idOrder) {
         return traceabilityMSClientResponseMapper.traceabilityMSOrderTraceResponseDtoListToOrderTraceList(traceabilityFeignClient.getOrderTracesByIdOrder(idOrder));
     }
+    
+    @Override
+    public String getOrderDurationByIdOrder(Long idOrder) {
+        return traceabilityFeignClient.getOrderDurationByIdOrder(idOrder);
+    }
 }

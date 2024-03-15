@@ -12,4 +12,5 @@ public interface IOrderRepository extends JpaRepository<OrderEntity, Long> {
     List<OrderEntity> findByIdClientAndStateNotIn(Long idClient, List<OrderStateEnum> excludedStates);
     Page<OrderEntity> findByRestaurantEntityIdAndState(Long idRestaurant, OrderStateEnum state, Pageable pageable);
     List<OrderEntity> findByIdClientAndState(Long idClient, OrderStateEnum state);
+    List<OrderEntity> findAllByIdChefAndState(Long idChef, OrderStateEnum state);
 }

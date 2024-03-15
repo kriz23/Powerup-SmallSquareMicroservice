@@ -4,10 +4,13 @@ import com.pragma.powerup_smallsquaremicroservice.domain.model.Dish;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Restaurant;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IRestaurantServicePort {
     void createRestaurant(String authHeader, Restaurant restaurant);
     Page<Restaurant> getAllRestaurantsPageable(int page, int size);
     Page<Dish> getAllDishesFromRestaurantByCategoryPageable(Long idRestaurant, Long idCategory, int page, int size);
+    List<Restaurant> getAllRestaurantsByIdOwner(String authHeader);
     
     boolean validateName(String name);
     boolean validateNIT(String nit);
