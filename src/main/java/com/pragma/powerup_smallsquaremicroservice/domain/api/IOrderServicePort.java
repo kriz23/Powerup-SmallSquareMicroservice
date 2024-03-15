@@ -1,6 +1,7 @@
 package com.pragma.powerup_smallsquaremicroservice.domain.api;
 
 import com.pragma.powerup_smallsquaremicroservice.domain.model.Order;
+import com.pragma.powerup_smallsquaremicroservice.domain.model.OrderTrace;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
 import org.springframework.data.domain.Page;
 
@@ -14,4 +15,5 @@ public interface IOrderServicePort {
     void setOrderDelivered(String authHeader, Long idOrder, String orderPIN);
     List<Order> getClientPendingOrders(String authHeader);
     void cancelOrder(String authHeader, Long idOrder);
+    List<OrderTrace> getOrderTracesByIdOrder(String authHeader, Long idOrder);
 }

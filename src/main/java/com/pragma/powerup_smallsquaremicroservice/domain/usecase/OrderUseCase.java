@@ -4,6 +4,7 @@ import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.ITraceabilityMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
@@ -31,11 +32,13 @@ public class OrderUseCase implements IOrderServicePort {
     private final IJwtServicePort jwtServicePort;
     private final OrderUtils orderUtils;
     private final IMessengerMSClientPort messengerMSClientPort;
+    private final ITraceabilityMSClientPort traceabilityMSClientPort;
     
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IOrderDishPersistencePort orderDishPersistencePort,
                         IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort,
                         IRestaurantEmployeeServicePort restaurantEmployeeServicePort, IUserMSClientPort userMSClientPort,
-                        IJwtServicePort jwtServicePort, OrderUtils orderUtils, IMessengerMSClientPort messengerMSClientPort) {
+                        IJwtServicePort jwtServicePort, OrderUtils orderUtils, IMessengerMSClientPort messengerMSClientPort,
+                        ITraceabilityMSClientPort traceabilityMSClientPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.orderDishPersistencePort = orderDishPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
@@ -45,6 +48,7 @@ public class OrderUseCase implements IOrderServicePort {
         this.jwtServicePort = jwtServicePort;
         this.orderUtils = orderUtils;
         this.messengerMSClientPort = messengerMSClientPort;
+        this.traceabilityMSClientPort = traceabilityMSClientPort;
     }
     
     @Override
@@ -96,6 +100,11 @@ public class OrderUseCase implements IOrderServicePort {
         Order createdOrder = orderPersistencePort.createOrder(order);
         order.getOrderDishes().forEach(orderDish -> orderDish.setOrder(createdOrder));
         orderDishPersistencePort.createOrderDishesFromOrder(order.getOrderDishes());
+        OrderTrace orderTrace = new OrderTrace(
+                null, createdOrder.getId(), createdOrder.getIdClient(), requestClient.getMail(), null,
+                createdOrder.getState().getState(), null, null, null, createdOrder.getUpdatedAt()
+        );
+        traceabilityMSClientPort.createOrderTrace(orderTrace);
     }
     
     @Override
@@ -133,6 +142,12 @@ public class OrderUseCase implements IOrderServicePort {
                 existingOrder.setState(existingOrder.getState().nextState());
                 existingOrder.setUpdatedAt(LocalDateTime.now());
                 orderPersistencePort.updateOrder(existingOrder);
+                OrderTrace orderTrace = new OrderTrace(
+                        null, existingOrder.getId(), null, null, OrderStateEnum.PENDING.getState(),
+                        OrderStateEnum.PREPARING.getState(), existingOrder.getIdChef(), requestEmployee.getMail(), null,
+                        existingOrder.getUpdatedAt()
+                );
+                traceabilityMSClientPort.updateOrderTrace(orderTrace);
             }
         }
     }
@@ -153,6 +168,12 @@ public class OrderUseCase implements IOrderServicePort {
                 existingOrder.setState(existingOrder.getState().nextState());
                 existingOrder.setUpdatedAt(LocalDateTime.now());
                 orderPersistencePort.updateOrder(existingOrder);
+                OrderTrace orderTrace = new OrderTrace(
+                        null, existingOrder.getId(), null, null, OrderStateEnum.PREPARING.getState(),
+                        OrderStateEnum.READY.getState(), null, null, null,
+                        existingOrder.getUpdatedAt()
+                );
+                traceabilityMSClientPort.updateOrderTrace(orderTrace);
                 if (!messengerMSClientPort.sendOrderReadyMessage(existingOrder.getClientPhone(), currentRestaurant.getPhone(),
                                                                  currentRestaurant.getName(), existingOrder.getPin())){
                     throw new MessageNotSentException();
@@ -175,6 +196,12 @@ public class OrderUseCase implements IOrderServicePort {
                 existingOrder.setState(existingOrder.getState().nextState());
                 existingOrder.setUpdatedAt(LocalDateTime.now());
                 orderPersistencePort.updateOrder(existingOrder);
+                OrderTrace orderTrace = new OrderTrace(
+                        null, existingOrder.getId(), null, null, OrderStateEnum.READY.getState(),
+                        OrderStateEnum.DELIVERED.getState(), null, null, null,
+                        existingOrder.getUpdatedAt()
+                );
+                traceabilityMSClientPort.updateOrderTrace(orderTrace);
             } else {
                 throw new OrderInvalidDeliveryException();
             }
@@ -200,9 +227,26 @@ public class OrderUseCase implements IOrderServicePort {
             existingOrder.setState(OrderStateEnum.CANCELLED);
             existingOrder.setUpdatedAt(LocalDateTime.now());
             orderPersistencePort.updateOrder(existingOrder);
+            OrderTrace orderTrace = new OrderTrace(
+                    null, existingOrder.getId(), null, null, OrderStateEnum.PENDING.getState(),
+                    OrderStateEnum.CANCELLED.getState(), null, null, null,
+                    existingOrder.getUpdatedAt()
+            );
+            traceabilityMSClientPort.updateOrderTrace(orderTrace);
         } else {
             throw new OrderNotCancelableException();
             // If needed, put the call to messengerMSClientPort here
         }
+    }
+    
+    @Override
+    public List<OrderTrace> getOrderTracesByIdOrder(String authHeader, Long idOrder) {
+        String requestUserMail = jwtServicePort.getMailFromToken(jwtServicePort.getTokenFromHeader(authHeader));
+        User requestClient = userMSClientPort.getUserByMail(authHeader, requestUserMail);
+        Order existingOrder = orderPersistencePort.getOrderById(idOrder);
+        if  (!existingOrder.getIdClient().equals(requestClient.getId())){
+            throw new ClientInvalidOperationException();
+        }
+        return traceabilityMSClientPort.getOrderTracesByIdOrder(idOrder);
     }
 }
