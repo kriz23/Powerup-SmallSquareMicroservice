@@ -26,3 +26,4 @@ appVersion: "1.0.0"
 
 powerup_usermicroservice_url: ${USER_MS_URL}
 powerup_messengermicroservice_url: ${MESSENGER_MS_URL}
+powerup_traceabilitymicroservice_url: ${TRACEABILITY_MS_URL}

@@ -3,6 +3,7 @@ package com.pragma.powerup_smallsquaremicroservice.domain.usecase;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IJwtServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IRestaurantEmployeeServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IMessengerMSClientPort;
+import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.ITraceabilityMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.clientapi.IUserMSClientPort;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.*;
 import com.pragma.powerup_smallsquaremicroservice.domain.model.*;
@@ -56,11 +57,14 @@ public class OrderUseCaseTest {
     @Mock
     private IMessengerMSClientPort messengerMSClientPort;
     
+    @Mock
+    private ITraceabilityMSClientPort traceabilityMSClientPort;
+    
     @InjectMocks
     private OrderUseCase orderUseCase;
     
     @Test
-    void createOrder_allValid_callsPersistencePort(){
+    void createOrder_allValid_callsPersistencePort_and_traceabilityMSClientPort(){
         String authHeader = "validHeader";
         String validToken = "validToken";
         String requestUserMail = "validRequestUserMail";
@@ -73,20 +77,21 @@ public class OrderUseCaseTest {
                                 null, restaurant , List.of(orderDish), 20000, "1234");
         when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
         when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
-        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
-                .thenReturn(new User(4L, "John", "Doe", "123456789", "+573107654321",
-                                     LocalDate.of(2000, 1, 1), "client@mail.com", "password",
-                                     new Role(4L, "ROLE_CLIENTE", "Admin")));
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail)).thenReturn(new User(4L, "John", "Doe", "123456789", "+573107654321",
+                                                                                              LocalDate.of(2000, 1, 1), "client@mail.com", "password",
+                                                                                              new Role(4L, "ROLE_CLIENTE", "Cliente")));
         when(restaurantPersistencePort.validateRestaurantExists(1L)).thenReturn(true);
         when(restaurantPersistencePort.getRestaurantById(1L)).thenReturn(restaurant);
         when(orderPersistencePort.clientHasUnfinishedOrders(4L)).thenReturn(false);
         when(dishPersistencePort.getActiveDishesFromRestaurantByDishesIds(1L, List.of(1L))).thenReturn(List.of(dish));
         when(orderUtils.calculateTotalPrice(List.of(orderDish))).thenReturn(20000.0);
+        when(orderPersistencePort.createOrder(order)).thenReturn(order);
         
         orderUseCase.createOrder(authHeader, order);
         
         verify(orderPersistencePort, times(1)).createOrder(order);
         verify(orderDishPersistencePort, times(1)).createOrderDishesFromOrder(List.of(orderDish));
+        verify(traceabilityMSClientPort, times(1)).createOrderTrace(any(OrderTrace.class));
     }
     
     @Test
@@ -294,7 +299,7 @@ public class OrderUseCaseTest {
     }
     
     @Test
-    void assignEmployeeToOrder_allValid_callsPersistencePort(){
+    void assignEmployeeToOrder_allValid_callsPersistencePort_and_traceabilityMSClientPort(){
         String authHeader = "validHeader";
         String validToken = "validToken";
         String requestUserMail = "validRequestUserMail";
@@ -327,6 +332,7 @@ public class OrderUseCaseTest {
         
         orderUseCase.assignEmployeeToOrder(authHeader, 1L);
         verify(orderPersistencePort, times(1)).updateOrder(order);
+        verify(traceabilityMSClientPort, times(1)).updateOrderTrace(any(OrderTrace.class));
     }
     
     @Test
@@ -363,7 +369,7 @@ public class OrderUseCaseTest {
     }
     
     @Test
-    void setOrderReady_allValid_callsPersistencePort_and_messengerMSClientPort(){
+    void setOrderReady_allValid_callsPersistencePort_and_messengerMSClientPort_and_traceabilityMSClientPort(){
         String authHeader = "validHeader";
         String validToken = "validToken";
         String requestUserMail = "validRequestUserMail";
@@ -402,6 +408,7 @@ public class OrderUseCaseTest {
         orderUseCase.setOrderReady(authHeader, 1L);
         verify(orderPersistencePort, times(1)).updateOrder(order);
         verify(messengerMSClientPort, times(1)).sendOrderReadyMessage("+573107654321", "+573101234567", "Restaurant", "1234");
+        verify(traceabilityMSClientPort, times(1)).updateOrderTrace(any(OrderTrace.class));
     }
     
     @Test
@@ -482,7 +489,7 @@ public class OrderUseCaseTest {
     }
     
     @Test
-    void setOrderDelivered_allValid_callsPersistencePort(){
+    void setOrderDelivered_allValid_callsPersistencePort_and_traceabilityMSClientPort(){
         String authHeader = "validHeader";
         String validToken = "validToken";
         String requestUserMail = "validRequestUserMail";
@@ -514,6 +521,7 @@ public class OrderUseCaseTest {
         when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
         orderUseCase.setOrderDelivered(authHeader, 1L, "123456");
         verify(orderPersistencePort, times(1)).updateOrder(order);
+        verify(traceabilityMSClientPort, times(1)).updateOrderTrace(any(OrderTrace.class));
     }
     
     @Test
@@ -602,7 +610,7 @@ public class OrderUseCaseTest {
     }
     
     @Test
-    void cancelOrder_allValid_callsPersistencePort(){
+    void cancelOrder_allValid_callsPersistencePort_and_traceabilityMSClientPort(){
         String authHeader = "validHeader";
         String validToken = "validToken";
         String requestUserMail = "validRequestUserMail";
@@ -632,6 +640,7 @@ public class OrderUseCaseTest {
         when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
         orderUseCase.cancelOrder(authHeader, 1L);
         verify(orderPersistencePort, times(1)).updateOrder(order);
+        verify(traceabilityMSClientPort, times(1)).updateOrderTrace(any(OrderTrace.class));
     }
     
     @Test
@@ -696,5 +705,70 @@ public class OrderUseCaseTest {
                                                                           2)), 20000, null);
         when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
         assertThrows(OrderNotCancelableException.class, () -> orderUseCase.cancelOrder(authHeader, 1L));
+    }
+    
+    @Test
+    void getOrderTracesByIdOrder_callsMSClientPort(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        Order order = new Order(1L, 4L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        orderUseCase.getOrderTracesByIdOrder(authHeader, 1L);
+        verify(traceabilityMSClientPort, times(1)).getOrderTracesByIdOrder(1L);
+    }
+    
+    @Test
+    void getOrderTracesByIdOrder_invalidOrderClient_throwsException(){
+        String authHeader = "validHeader";
+        String validToken = "validToken";
+        String requestUserMail = "validRequestUserMail";
+        when(jwtServicePort.getTokenFromHeader(authHeader)).thenReturn(validToken);
+        when(jwtServicePort.getMailFromToken(validToken)).thenReturn(requestUserMail);
+        when(userMSClientPort.getUserByMail(authHeader, requestUserMail))
+                .thenReturn(new User(4L, "John", "Doe","123456789","+573101234567",
+                                     LocalDate.of(2000, 1, 1),"client@mail.com", "password",
+                                     new Role(4L, "ROLE_CLIENTE", "Cliente")));
+        Order order = new Order(1L, 5L, "+573107654321", LocalDateTime.now(), LocalDateTime.now(),
+                                OrderStateEnum.PENDING, null,
+                                new Restaurant(1L, "Restaurant", "123456789", "Calle 123", "+573107654321", "www.logo.com",
+                                               2L), List.of(new OrderDish(1L, new Order(), new Dish(1L, "Dish",
+                                                                                                    new Category(1L,
+                                                                                                                 "Categoría",
+                                                                                                                 "Descripción"),
+                                                                                                    "Descripción", 10000,
+                                                                                                    new Restaurant(1L,
+                                                                                                                   "Restaurant",
+                                                                                                                   "123456789",
+                                                                                                                   "Calle 123",
+                                                                                                                   "+573107654321",
+                                                                                                                   "www.logo.com",
+                                                                                                                   2L),
+                                                                                                    "www.image.com", true),
+                                                                          2)), 20000, null);
+        when(orderPersistencePort.getOrderById(1L)).thenReturn(order);
+        assertThrows(ClientInvalidOperationException.class, () -> orderUseCase.getOrderTracesByIdOrder(authHeader, 1L));
     }
 }

@@ -2,6 +2,7 @@ package com.pragma.powerup_smallsquaremicroservice.infrastructure.input.rest;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.OrderRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderResponseDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderTraceResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IOrderHandler;
 import com.pragma.powerup_smallsquaremicroservice.domain.exception.ClientOrderInvalidException;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
@@ -102,8 +103,8 @@ public class OrderRestController {
     }
     
     @Operation(summary = "Get client pending orders")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "All categories returned", content =
-    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation =
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "All client pending orders returned",
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation =
             OrderResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not allowed for this " +
             "operation", content = @Content), @ApiResponse(responseCode = "404", description = "No data found",
             content = @Content)})
@@ -124,4 +125,18 @@ public class OrderRestController {
         orderHandler.cancelOrder(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    
+    @Operation(summary = "Get Order trace by id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Order trace returned",
+            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation =
+                    OrderTraceResponseDto.class)))), @ApiResponse(responseCode = "403", description = "User not allowed for " +
+            "this operation", content = @Content), @ApiResponse(responseCode = "404", description = "No data found",
+            content = @Content)})
+    @GetMapping("/clients/orders/trace/{id}")
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<List<OrderTraceResponseDto>> getOrderTracesByIdOrder(@Parameter(description = "Order id") @PathVariable Long id,
+                                                                               HttpServletRequest request){
+        return ResponseEntity.ok(orderHandler.getOrderTracesByIdOrder(id, request));
+    }
+    
 }

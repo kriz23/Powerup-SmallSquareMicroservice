@@ -2,9 +2,11 @@ package com.pragma.powerup_smallsquaremicroservice.application.handler.impl;
 
 import com.pragma.powerup_smallsquaremicroservice.application.dto.request.OrderRequestDto;
 import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderResponseDto;
+import com.pragma.powerup_smallsquaremicroservice.application.dto.response.OrderTraceResponseDto;
 import com.pragma.powerup_smallsquaremicroservice.application.handler.IOrderHandler;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IOrderRequestMapper;
 import com.pragma.powerup_smallsquaremicroservice.application.mapper.IOrderResponseMapper;
+import com.pragma.powerup_smallsquaremicroservice.application.mapper.IOrderTraceResponseMapper;
 import com.pragma.powerup_smallsquaremicroservice.domain.api.IOrderServicePort;
 import com.pragma.powerup_smallsquaremicroservice.domain.utils.OrderStateEnum;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class OrderHandler implements IOrderHandler {
     private final IOrderServicePort orderServicePort;
     private final IOrderRequestMapper orderRequestMapper;
     private final IOrderResponseMapper orderResponseMapper;
+    private final IOrderTraceResponseMapper orderTraceResponseMapper;
     
     @Override
     public void createOrder(OrderRequestDto orderRequestDto, HttpServletRequest request) {
@@ -65,5 +68,11 @@ public class OrderHandler implements IOrderHandler {
     public void cancelOrder(Long idOrder, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         orderServicePort.cancelOrder(authHeader, idOrder);
+    }
+    
+    @Override
+    public List<OrderTraceResponseDto> getOrderTracesByIdOrder(Long idOrder, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return orderTraceResponseMapper.orderTraceListToOrderTraceResponseDtoList(orderServicePort.getOrderTracesByIdOrder(authHeader, idOrder));
     }
 }
